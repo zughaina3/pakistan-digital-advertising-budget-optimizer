@@ -20,7 +20,7 @@
 
 In the rapidly evolving Pakistani e-commerce landscape, direct-to-consumer (D2C) brands launching **stitched lawn pret, festive collections, and university accessories (tote bags, laptop backpacks)** face rising Customer Acquisition Costs (CAC/CPA) and volatile platform returns.
 
-Building directly upon **[Phase 1: Pakistani Social Media Content Detective](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)**—where we scraped and analyzed authentic Pakistani consumer interactions and Roman Urdu purchase sentiment across brands like *Khaadi, Sapphire, Limelight, Generation, and The Tote Bag Club PK*—**Phase 2** scales into enterprise-grade **Big Data performance marketing analytics and algorithmic budget reallocation**.
+Building upon authentic Pakistani consumer market research—analyzing customer interactions and purchase sentiment across brands like *Khaadi, Sapphire, Limelight, Generation, and The Tote Bag Club PK*—this project scales into enterprise-grade **Big Data performance marketing analytics and algorithmic budget reallocation**.
 
 ### Key Questions Answered:
 1. **Which digital ad platform yields the highest ROAS in Pakistan?** (Google 4.62x vs. Instagram 4.32x vs. Facebook 3.01x vs. TikTok 2.40x vs. YouTube 1.81x)
@@ -238,6 +238,5 @@ python run_pipeline.py
 
 **Zughaina** — Senior Marketing Data Analyst  
 - GitHub: [@zughaina3](https://github.com/zughaina3)  
-- Phase 2 Project: [Pakistan Digital Advertising Budget Optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
-- Phase 1 Project: [Pakistani Social Media Content Detective](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
+- Project 2 Repository: [Pakistan Digital Advertising Budget Optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
 - Reference Template: [Marketing Campaign Analytics](https://github.com/tmlarocq-lgtm/marketing-campaign-analytics)

@@ -5,7 +5,6 @@
 **Author:** Zughaina ([@zughaina3](https://github.com/zughaina3))  
 **Portfolio Track:** Senior Marketing Data Analyst & Big Data Analytics  
 **Phase 2 GitHub Repository:** [https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
-**Phase 1 Portfolio Project:** [https://github.com/zughaina3/pakistan-digital-marketing-intelligence](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
 **Reporting Period:** 2025 – 2026 E-Commerce Campaign Cycle  
 
 ---
@@ -251,5 +250,4 @@ The repository includes 9 ANSI-SQL queries compatible with BigQuery, Snowflake, 
 **Report Author:**  
 **Zughaina** — Senior Marketing Data Analyst  
 GitHub: [@zughaina3](https://github.com/zughaina3)  
-Phase 1 Repository: [pakistan-digital-marketing-intelligence](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
 Phase 2 Repository: [pakistan-digital-advertising-budget-optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)

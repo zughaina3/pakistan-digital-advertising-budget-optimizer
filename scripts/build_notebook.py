@@ -38,7 +38,6 @@ def build_colab_notebook(output_path: str = 'notebooks/Pakistan_Ad_Budget_Optimi
 **Portfolio Track: Senior Marketing Data Analyst & Big Data Analytics**  
 **Author:** Zughaina ([@zughaina3](https://github.com/zughaina3))  
 **Phase 2 GitHub Repository:** [https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
-**Previous Phase:** [Phase 1: Social Media Content Detective](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
 
 ---
 
