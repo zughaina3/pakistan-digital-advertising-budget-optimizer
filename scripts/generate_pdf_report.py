@@ -56,6 +56,7 @@ class NumberedCanvas(canvas.Canvas):
 
     def save(self):
         num_pages = len(self._saved_page_states)
+        print(f"📊 PDF Page Count: {num_pages} pages")
         for state in self._saved_page_states:
             self.__dict__.update(state)
             self.draw_page_decorations(num_pages)
@@ -304,11 +305,11 @@ def build_pdf(
             Paragraph("<b>Domain:</b> Pakistani D2C E-Commerce (Fashion, Lawn & Bags)", styles['TableCell']),
         ],
         [
-            Paragraph("<b>Previous Phase:</b> Social Media Content Detective", styles['TableCell']),
+            Paragraph("<b>Phase 2 GitHub:</b> <a href='https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer'><font color='#01696F'><u>https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer</u></font></a>", styles['TableCell']),
             Paragraph("<b>Capital Optimization Scope:</b> Rs. 1,000,000 (PKR 1.0M)", styles['TableCell']),
         ],
         [
-            Paragraph("<b>Data Simulation Tiers:</b> 10K, 100K, 1M, 10M Records", styles['TableCell']),
+            Paragraph("<b>Phase 1 Portfolio:</b> <a href='https://github.com/zughaina3/pakistan-digital-marketing-intelligence'><font color='#01696F'><u>https://github.com/zughaina3/pakistan-digital-marketing-intelligence</u></font></a>", styles['TableCell']),
             Paragraph("<b>Benchmark Architectures:</b> Pandas | MapReduce | Apache Spark", styles['TableCell']),
         ]
     ]
@@ -870,8 +871,8 @@ def build_pdf(
     # Concluding Sign-off Box
     signoff = Paragraph(
         "<b>Report Prepared by:</b> Zughaina — Senior Marketing Data Analyst<br/>"
-        "<b>Phase 2 GitHub Repository:</b> <font color='#01696F'>https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer</font><br/>"
-        "<b>Phase 1 Portfolio Link:</b> <font color='#01696F'>https://github.com/zughaina3/pakistan-digital-marketing-intelligence</font><br/>"
+        "<b>Phase 2 GitHub Repository:</b> <a href='https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer'><font color='#01696F'><u>https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer</u></font></a><br/>"
+        "<b>Phase 1 Portfolio Link:</b> <a href='https://github.com/zughaina3/pakistan-digital-marketing-intelligence'><font color='#01696F'><u>https://github.com/zughaina3/pakistan-digital-marketing-intelligence</u></font></a><br/>"
         "<b>Data Architecture:</b> Fully verified across 10,000,000 records using Apache Spark & Pandas on multi-core architecture.",
         styles['CalloutBox']
     )

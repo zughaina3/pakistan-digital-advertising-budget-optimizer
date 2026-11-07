@@ -238,5 +238,6 @@ python run_pipeline.py
 
 **Zughaina** — Senior Marketing Data Analyst  
 - GitHub: [@zughaina3](https://github.com/zughaina3)  
+- Phase 2 Project: [Pakistan Digital Advertising Budget Optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
 - Phase 1 Project: [Pakistani Social Media Content Detective](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
 - Reference Template: [Marketing Campaign Analytics](https://github.com/tmlarocq-lgtm/marketing-campaign-analytics)

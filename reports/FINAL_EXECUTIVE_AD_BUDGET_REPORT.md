@@ -4,8 +4,8 @@
 **Prepared for:** Executive Leadership, Chief Marketing Officer (CMO) & Growth Strategy Teams  
 **Author:** Zughaina ([@zughaina3](https://github.com/zughaina3))  
 **Portfolio Track:** Senior Marketing Data Analyst & Big Data Analytics  
-**Previous Phase:** [Phase 1: Social Media Content Detective](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
-**Reference Benchmark:** [Marketing Campaign Analytics](https://github.com/tmlarocq-lgtm/marketing-campaign-analytics)  
+**Phase 2 GitHub Repository:** [https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)  
+**Phase 1 Portfolio Project:** [https://github.com/zughaina3/pakistan-digital-marketing-intelligence](https://github.com/zughaina3/pakistan-digital-marketing-intelligence)  
 **Reporting Period:** 2025 – 2026 E-Commerce Campaign Cycle  
 
 ---

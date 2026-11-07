@@ -110,4 +110,4 @@ based on simulated historical performance.
 
 There are already GitHub projects around campaign performance, CAC, CTR,
 CVR, ROAS and budget reallocation that provide good starting points.
-[[GitHub]{.underline}](https://github.com/tmlarocq-lgtm/marketing-campaign-analytics?utm_source=chatgpt.com)
+[[GitHub]{.underline}](https://github.com/zughaina3/pakistan-digital-advertising-budget-optimizer)
