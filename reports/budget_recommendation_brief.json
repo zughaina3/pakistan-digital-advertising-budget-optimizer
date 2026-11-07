@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "project": "Pakistan Digital Advertising Budget Optimizer (Phase 2)",
+    "question": "Where should we spend the next Rs. 1 Million?",
+    "total_budget_pkr": 1000000.0,
+    "currency": "PKR"
+  },
+  "recommended_allocation": {
+    "strategy": "balanced",
+    "total_budget": 1000000.0,
+    "total_revenue": 3090388.21,
+    "blended_roas": 3.09,
+    "blended_cpa": 571.43,
+    "total_conversions": 1750,
+    "total_clicks": 51179,
+    "total_impressions": 2176864,
+    "net_profit": 2090388.21,
+    "channels": [
+      {
+        "platform": "Google",
+        "spend": 350000.0,
+        "impressions": 361176,
+        "clicks": 12280,
+        "conversions": 589,
+        "revenue": 1247085.03,
+        "roas": 3.56,
+        "cpa": 594.23,
+        "net_profit": 897085.03,
+        "allocation_pct": 35.0
+      },
+      {
+        "platform": "Instagram",
+        "spend": 300000.0,
+        "impressions": 633961,
+        "clicks": 16483,
+        "conversions": 659,
+        "revenue": 1018956.61,
+        "roas": 3.4,
+        "cpa": 455.24,
+        "net_profit": 718956.61,
+        "allocation_pct": 30.0
+      },
+      {
+        "platform": "Facebook",
+        "spend": 200000.0,
+        "impressions": 505000,
+        "clicks": 9090,
+        "conversions": 272,
+        "revenue": 519327.11,
+        "roas": 2.6,
+        "cpa": 735.29,
+        "net_profit": 319327.11,
+        "allocation_pct": 20.0
+      },
+      {
+        "platform": "TikTok",
+        "spend": 100000.0,
+        "impressions": 534727,
+        "clicks": 11764,
+        "conversions": 199,
+        "revenue": 218785.87,
+        "roas": 2.19,
+        "cpa": 502.51,
+        "net_profit": 118785.87,
+        "allocation_pct": 10.0
+      },
+      {
+        "platform": "YouTube",
+        "spend": 50000.0,
+        "impressions": 142000,
+        "clicks": 1562,
+        "conversions": 31,
+        "revenue": 86233.59,
+        "roas": 1.72,
+        "cpa": 1612.9,
+        "net_profit": 36233.59,
+        "allocation_pct": 5.0
+      }
+    ]
+  },
+  "alternative_scenarios": {
+    "roas_maximizer": {
+      "strategy": "roas_max",
+      "total_budget": 1000000.0,
+      "total_revenue": 3181054.56,
+      "blended_roas": 3.18,
+      "blended_cpa": 546.75,
+      "total_conversions": 1829,
+      "total_clicks": 47719,
+      "total_impressions": 1850137,
+      "net_profit": 2181054.56,
+      "channels": [
+        {
+          "platform": "Google",
+          "spend": 450000.0,
+          "impressions": 464382,
+          "clicks": 15789,
+          "conversions": 757,
+          "revenue": 1512974.75,
+          "roas": 3.36,
+          "cpa": 594.45,
+          "net_profit": 1062974.75,
+          "allocation_pct": 45.0
+        },
+        {
+          "platform": "Instagram",
+          "spend": 350000.0,
+          "impressions": 739615,
+          "clicks": 19230,
+          "conversions": 769,
+          "revenue": 1150849.6,
+          "roas": 3.29,
+          "cpa": 455.14,
+          "net_profit": 800849.6,
+          "allocation_pct": 35.0
+        },
+        {
+          "platform": "Facebook",
+          "spend": 150000.0,
+          "impressions": 378777,
+          "clicks": 6818,
+          "conversions": 204,
+          "revenue": 402857.99,
+          "roas": 2.69,
+          "cpa": 735.29,
+          "net_profit": 252857.99,
+          "allocation_pct": 15.0
+        },
+        {
+          "platform": "TikTok",
+          "spend": 50000.0,
+          "impressions": 267363,
+          "clicks": 5882,
+          "conversions": 99,
+          "revenue": 114372.22,
+          "roas": 2.29,
+          "cpa": 505.05,
+          "net_profit": 64372.22,
+          "allocation_pct": 5.0
+        },
+        {
+          "platform": "YouTube",
+          "spend": 0.0,
+          "allocation_pct": 0.0,
+          "impressions": 0,
+          "clicks": 0,
+          "conversions": 0,
+          "revenue": 0.0,
+          "roas": 0.0,
+          "cpa": 0.0,
+          "net_profit": 0.0
+        }
+      ]
+    },
+    "aggressive_scale": {
+      "strategy": "scale_max",
+      "total_budget": 1000000.0,
+      "total_revenue": 2989779.12,
+      "blended_roas": 2.99,
+      "blended_cpa": 528.26,
+      "total_conversions": 1893,
+      "total_clicks": 64230,
+      "total_impressions": 2713225,
+      "net_profit": 1989779.12,
+      "channels": [
+        {
+          "platform": "Google",
+          "spend": 250000.0,
+          "impressions": 257970,
+          "clicks": 8771,
+          "conversions": 421,
+          "revenue": 949513.4,
+          "roas": 3.8,
+          "cpa": 593.82,
+          "net_profit": 699513.4,
+          "allocation_pct": 25.0
+        },
+        {
+          "platform": "Instagram",
+          "spend": 350000.0,
+          "impressions": 739615,
+          "clicks": 19230,
+          "conversions": 769,
+          "revenue": 1150849.6,
+          "roas": 3.29,
+          "cpa": 455.14,
+          "net_profit": 800849.6,
+          "allocation_pct": 35.0
+        },
+        {
+          "platform": "Facebook",
+          "spend": 150000.0,
+          "impressions": 378777,
+          "clicks": 6818,
+          "conversions": 204,
+          "revenue": 402857.99,
+          "roas": 2.69,
+          "cpa": 735.29,
+          "net_profit": 252857.99,
+          "allocation_pct": 15.0
+        },
+        {
+          "platform": "TikTok",
+          "spend": 250000.0,
+          "impressions": 1336863,
+          "clicks": 29411,
+          "conversions": 499,
+          "revenue": 486558.13,
+          "roas": 1.95,
+          "cpa": 501.0,
+          "net_profit": 236558.13,
+          "allocation_pct": 25.0
+        },
+        {
+          "platform": "YouTube",
+          "spend": 0.0,
+          "allocation_pct": 0.0,
+          "impressions": 0,
+          "clicks": 0,
+          "conversions": 0,
+          "revenue": 0.0,
+          "roas": 0.0,
+          "cpa": 0.0,
+          "net_profit": 0.0
+        }
+      ]
+    }
+  },
+  "city_targeting_breakdown": [
+    {
+      "city_region": "Karachi",
+      "budget_rs": 350000.0,
+      "allocation_pct": 35.0,
+      "strategic_rationale": "Mega-city e-commerce hub, highest COD volume & GMV"
+    },
+    {
+      "city_region": "Lahore",
+      "budget_rs": 280000.0,
+      "allocation_pct": 28.0,
+      "strategic_rationale": "Fashion capital, highest lawn pret & designer demand"
+    },
+    {
+      "city_region": "Islamabad / Rawalpindi",
+      "budget_rs": 210000.0,
+      "allocation_pct": 21.0,
+      "strategic_rationale": "Highest AOV & premium purchasing power"
+    },
+    {
+      "city_region": "Faisalabad",
+      "budget_rs": 60000.0,
+      "allocation_pct": 6.0,
+      "strategic_rationale": "Textile hub, value-conscious buyer base"
+    },
+    {
+      "city_region": "Multan & South Punjab",
+      "budget_rs": 50000.0,
+      "allocation_pct": 5.0,
+      "strategic_rationale": "Growing tier-2 COD adoption"
+    },
+    {
+      "city_region": "Peshawar & KPK",
+      "budget_rs": 30000.0,
+      "allocation_pct": 3.0,
+      "strategic_rationale": "Selective formal and festive unstitched wear"
+    },
+    {
+      "city_region": "Other Tier-2 Cities",
+      "budget_rs": 20000.0,
+      "allocation_pct": 2.0,
+      "strategic_rationale": "Emerging regional digital shoppers"
+    }
+  ],
+  "executive_action_plan": [
+    "Allocate Rs. 350,000 (35%) to Google Ads targeting high-intent shopping and brand search terms.",
+    "Allocate Rs. 300,000 (30%) to Instagram Reels and Carousel Ads featuring aesthetic haul unboxings.",
+    "Allocate Rs. 200,000 (20%) to Facebook Feed and retargeting ads focusing on 25-44 family buyers.",
+    "Allocate Rs. 100,000 (10%) to TikTok Ads for low-CPC top-of-funnel youth discovery (tote bags & accessories).",
+    "Allocate Rs. 50,000 (5%) to YouTube Ads for brand recall and video creator tie-ins.",
+    "Concentrate 63% of the media budget into Karachi (Rs. 350K) and Lahore (Rs. 280K) for courier COD efficiency."
+  ]
+}

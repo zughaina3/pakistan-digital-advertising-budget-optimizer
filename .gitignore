@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.py[cod]
+.matplotlib_cache/
+.chrome_profile/
+.ipynb_checkpoints/
+.DS_Store
+*.html
+data/raw/campaign_data_1m.csv
