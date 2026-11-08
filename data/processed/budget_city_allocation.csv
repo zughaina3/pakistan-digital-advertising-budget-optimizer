@@ -1,11 +1,11 @@
 city_region,budget_rs,allocation_pct,empirical_roas,strategic_rationale
-Karachi,362002.94,36.2,4.08,"Mega-city e-commerce hub, highest COD parcel volume & customer density"
-Lahore,285737.71,28.6,4.07,"Fashion and lawn pret capital, highest visual lifestyle demand"
-Islamabad,152018.23,15.2,4.44,Highest per-capita purchasing power and premium festive collection AOV
-Rawalpindi,78213.25,7.8,4.47,High density twin-city order volume with fast courier transit times
-Faisalabad,41601.26,4.2,3.59,"Textile and industrial hub, value-conscious volume buyers"
-Multan,34663.21,3.5,3.57,South Punjab regional hub with rising mobile COD adoption
-Peshawar,17953.39,1.8,2.95,Selective demand for festive and unstitched formal wear
-Sialkot,16227.25,1.6,3.52,High export-economy purchasing power with low doorstep rejection
-Quetta,5965.48,0.6,2.92,Emerging regional market with higher delivery lead-times
-Gujranwala,5617.26,0.6,2.88,"Tier-2 commercial center, responsive to clearance sales"
+Karachi,362000.0,36.2,4.08,"Mega-city e-commerce hub, highest COD parcel volume & customer density"
+Lahore,286000.0,28.6,4.07,"Fashion and lawn pret capital, highest visual lifestyle demand"
+Islamabad,152000.0,15.2,4.44,Highest per-capita purchasing power and premium festive collection AOV
+Rawalpindi,78000.0,7.8,4.47,High density twin-city order volume with fast courier transit times
+Faisalabad,42000.0,4.2,3.59,"Textile and industrial hub, value-conscious volume buyers"
+Multan,35000.0,3.5,3.57,South Punjab regional hub with rising mobile COD adoption
+Peshawar,18000.0,1.8,2.95,Selective demand for festive and unstitched formal wear
+Sialkot,16000.0,1.6,3.52,High export-economy purchasing power with low doorstep rejection
+Gujranwala,6000.0,0.6,2.88,"Tier-2 commercial center, responsive to clearance sales"
+Quetta,6000.0,0.6,2.92,Emerging regional market with higher delivery lead-times

@@ -1,13 +1,13 @@
-engine,records,elapsed_sec,peak_mem_mb,throughput_rps,rows_output,tier
-Pandas (In-Memory),10000,0.0033,0.89,3014583,50,10k
-MapReduce (Multi-Proc),10000,0.3094,73.44,32317,50,10k
-Spark (Partitioned DAG),10000,0.0102,0.5,980768,50,10k
-Pandas (In-Memory),100000,0.013,0.5,7716347,50,100k
-MapReduce (Multi-Proc),100000,0.3507,32.83,285121,50,100k
-Spark (Partitioned DAG),100000,0.0226,0.5,4426100,50,100k
-Pandas (In-Memory),1000000,0.1127,10.8,8874541,50,1m
-MapReduce (Multi-Proc),1000000,0.961,379.84,1040597,50,1m
-Spark (Partitioned DAG),1000000,0.1518,0.5,6585914,50,1m
-Pandas (In-Memory),10000000,37.0748,719.83,269725,50,10m
-MapReduce (Multi-Proc),10000000,50.5145,37.97,197963,50,10m
-Spark (Partitioned DAG),10000000,36.7676,79.39,271978,50,10m
+engine,records,tier,elapsed_sec,peak_mem_mb,throughput_rps,rows_output
+Pandas (In-Memory),10000,10k,0.0032,73.69,3111992,50
+MapReduce (Multi-Proc),10000,10k,0.3685,146.77,27139,50
+Spark (Partitioned DAG),10000,10k,0.01,74.09,1001895,50
+Pandas (In-Memory),100000,100k,0.0134,101.98,7482439,50
+MapReduce (Multi-Proc),100000,100k,0.4028,207.8,248272,50
+Spark (Partitioned DAG),100000,100k,0.0227,102.64,4402627,50
+Pandas (In-Memory),1000000,1m,0.121,369.61,8267580,50
+MapReduce (Multi-Proc),1000000,1m,1.005,805.84,995013,50
+Spark (Partitioned DAG),1000000,1m,0.1461,383.22,6845482,50
+Pandas (In-Memory),10000000,10m,3.967,1411.44,2520782,50
+MapReduce (Multi-Proc),10000000,10m,17.7229,1652.97,564240,50
+Spark (Partitioned DAG),10000000,10m,4.9404,1368.7,2024132,50

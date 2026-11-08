@@ -7,28 +7,30 @@ Compares 3 computational paradigms across 4 data scale tiers:
   Tiers: 10,000 | 100,000 | 1,000,000 | 10,000,000 records
 
 Paradigms Compared:
-  1. Pandas: Single-node, in-memory vectorized aggregation (C-optimized)
+  1. Pandas (In-Memory): Single-node, in-memory vectorized aggregation (C-optimized)
   2. MapReduce Architecture (Simulation): Multi-process streaming Map-Combine-Shuffle-Reduce
-  3. Apache Spark Engine (Simulation / Native): Partition-based DAG execution with lazy evaluation
-     and memory-optimized shuffled aggregation (with native PySpark support if Java is installed)
+  3. Apache Spark Engine (Simulation): Partition-based DAG execution with Catalyst optimization
+     and memory-optimized shuffled aggregation
 
-Metrics Tracked:
-  - Wall-Clock Execution Time (seconds)
-  - True Peak Resident Memory Usage (RSS MB, including child processes via resource.getrusage)
-  - Processing Throughput (records / second)
-  - Scaling Behavior (Single-node overhead vs. distributed scaling)
+Key Measurement Integrity Features:
+  - Process Isolation: Each benchmark run executes in a dedicated fresh Python subprocess,
+    preventing lifetime `ru_maxrss` high-water mark bleeding and artificial memory clamping.
+  - Pure Aggregation Timing: In the 10M streaming tier, data generation is strictly separated
+    from computation timing; the timer measures ONLY engine aggregation and partition reduction.
 """
 
 import os
 import gc
 import sys
 import time
+import json
 import resource
+import argparse
+import subprocess
 import multiprocessing as mp
 from collections import defaultdict
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
 
 import importlib
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -39,7 +41,7 @@ PLATFORMS = _gen_mod.PLATFORMS
 CITIES = _gen_mod.CITIES
 
 
-def get_peak_rss_mb() -> float:
+def get_process_peak_rss_mb() -> float:
     """
     Measure peak Resident Set Size (RSS) memory across the main process AND all child worker processes.
     Uses Python's standard library resource module.
@@ -68,7 +70,7 @@ def run_pandas_engine(df: pd.DataFrame) -> pd.DataFrame:
     agg['cpa'] = (agg['spend'] / agg['conversions']).round(2)
     agg['ctr'] = ((agg['clicks'] / agg['impressions']) * 100).round(2)
     agg['cvr'] = ((agg['conversions'] / agg['clicks']) * 100).round(2)
-    return agg.sort_values('revenue', ascending=False)
+    return agg.sort_values('revenue', ascending=False).reset_index(drop=True)
 
 
 # ==============================================================================
@@ -213,42 +215,113 @@ def run_spark_simulation_engine(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ==============================================================================
-# 4. BENCHMARK HARVESTER & STATISTICAL TRACKER
+# 4. ISOLATED WORKER PROCESS RUNNER
 # ==============================================================================
 
-def benchmark_engine(engine_name: str, runner_func, data) -> dict:
-    """Run an aggregation engine and capture precise wall-clock time and RSS memory."""
-    gc.collect()
-    start_rss = get_peak_rss_mb()
-    start_time = time.perf_counter()
-    
-    result_df = runner_func(data)
-    
-    elapsed_sec = time.perf_counter() - start_time
-    end_rss = get_peak_rss_mb()
-    peak_rss_delta = max(0.5, end_rss - start_rss)
+def execute_isolated_worker(engine: str, tier: str, csv_path: str = None) -> dict:
+    """
+    Executed inside a dedicated fresh Python process to guarantee zero memory contamination.
+    Times strictly the aggregation logic and measures the process's peak RSS.
+    """
     gc.collect()
     
-    num_records = len(data) if hasattr(data, '__len__') else 0
-    throughput = int(num_records / elapsed_sec) if elapsed_sec > 0 else 0
+    if tier in ['10k', '100k', '1m']:
+        if csv_path and os.path.exists(csv_path):
+            df = pd.read_csv(csv_path)
+        else:
+            count = 10000 if tier == '10k' else (100000 if tier == '100k' else 1000000)
+            df = generate_batch(count, seed=42)
+            
+        gc.collect()
+        t0 = time.perf_counter()
+        if engine == 'pandas':
+            res = run_pandas_engine(df)
+        elif engine == 'mapreduce':
+            res = run_mapreduce_engine(df)
+        elif engine == 'spark':
+            res = run_spark_simulation_engine(df)
+        else:
+            raise ValueError(f"Unknown engine: {engine}")
+        elapsed = time.perf_counter() - t0
+        rows_out = len(res)
+        num_records = len(df)
+        
+    elif tier == '10m':
+        total_records = 10_000_000
+        chunk_size = 1_000_000
+        total_time = 0.0
+        acc = None
+        
+        if engine == 'pandas':
+            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=101):
+                t0 = time.perf_counter()
+                c_agg = chunk_df.groupby(['platform', 'city']).agg({
+                    'spend': 'sum', 'revenue': 'sum', 'impressions': 'sum', 'clicks': 'sum', 'conversions': 'sum'
+                }).reset_index()
+                acc = c_agg if acc is None else pd.concat([acc, c_agg]).groupby(['platform', 'city']).sum().reset_index()
+                total_time += (time.perf_counter() - t0)
+            rows_out = len(acc)
+            
+        elif engine == 'spark':
+            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=301):
+                t0 = time.perf_counter()
+                c_spark = run_spark_simulation_engine(chunk_df)
+                acc = c_spark if acc is None else pd.concat([acc, c_spark]).groupby(['platform', 'city']).sum().reset_index()
+                total_time += (time.perf_counter() - t0)
+            rows_out = len(acc)
+            
+        elif engine == 'mapreduce':
+            mr_global = defaultdict(lambda: [0.0, 0.0, 0, 0, 0])
+            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=201):
+                t0 = time.perf_counter()
+                c_mr = run_mapreduce_engine(chunk_df)
+                for _, r in c_mr.iterrows():
+                    k = (r['platform'], r['city'])
+                    a = mr_global[k]
+                    a[0] += r['spend']
+                    a[1] += r['revenue']
+                    a[2] += r['impressions']
+                    a[3] += r['clicks']
+                    a[4] += r['conversions']
+                total_time += (time.perf_counter() - t0)
+            rows_out = len(mr_global)
+            
+        elapsed = total_time
+        num_records = total_records
+    else:
+        raise ValueError(f"Unknown tier: {tier}")
+        
+    peak_rss = get_process_peak_rss_mb()
+    throughput = int(num_records / elapsed) if elapsed > 0 else 0
+    
+    engine_display = {
+        'pandas': 'Pandas (In-Memory)',
+        'mapreduce': 'MapReduce (Multi-Proc)',
+        'spark': 'Spark (Partitioned DAG)'
+    }[engine]
     
     return {
-        'engine': engine_name,
+        'engine': engine_display,
         'records': num_records,
-        'elapsed_sec': round(elapsed_sec, 4),
-        'peak_mem_mb': round(peak_rss_delta, 2),
+        'tier': tier,
+        'elapsed_sec': round(elapsed, 4),
+        'peak_mem_mb': round(peak_rss, 2),
         'throughput_rps': throughput,
-        'rows_output': len(result_df)
+        'rows_output': rows_out
     }
 
 
+# ==============================================================================
+# 5. BENCHMARK ORCHESTRATOR
+# ==============================================================================
+
 def run_full_benchmark(data_dir: str = 'data/raw', output_csv: str = 'data/processed/benchmark_results.csv', include_10m: bool = True):
     """
-    Execute comprehensive benchmark across:
-      - 10,000 records
-      - 100,000 records
-      - 1,000,000 records
-      - 10,000,000 records (streaming distinct batches)
+    Orchestrate isolated execution across 4 tiers:
+      - 10K records
+      - 100K records
+      - 1M records
+      - 10M records (Streaming distinct chunks, pure aggregation timing)
     """
     os.makedirs(os.path.dirname(output_csv), exist_ok=True)
     results = []
@@ -259,115 +332,42 @@ def run_full_benchmark(data_dir: str = 'data/raw', output_csv: str = 'data/proce
         ('1m', 1000000, os.path.join(data_dir, 'campaign_data_1m.csv'))
     ]
     
+    if include_10m:
+        tiers.append(('10m', 10000000, None))
+        
     print("\n" + "=" * 90)
     print(" 🚀 BIG DATA BENCHMARK: PANDAS vs. MAPREDUCE vs. SPARK ARCHITECTURE")
     print("=" * 90)
-    print("Running standardized aggregation task: Group by (platform, city)...")
-    print("Memory tracked via standard library resource.getrusage (RSS across parent + child workers)")
+    print("Methodological Standards:")
+    print("  ✓ Isolated Process Execution: Each engine runs in a fresh process to measure true peak RSS.")
+    print("  ✓ Pure Aggregation Timing: 10M tier times computation strictly, excluding data generation.")
+    print("  ✓ Standardized Workload: Multi-dimensional group by (platform, city) with metric projections.")
+    
+    python_bin = sys.executable
+    script_path = os.path.abspath(__file__)
     
     for label, count, csv_path in tiers:
         print(f"\n--- Tier: {label.upper()} ({count:,} records) ---")
-        if not os.path.exists(csv_path):
-            print(f"File {csv_path} not found. Generating on the fly...")
-            df = generate_batch(count, seed=42)
-        else:
-            df = pd.read_csv(csv_path)
+        for eng in ['pandas', 'mapreduce', 'spark']:
+            cmd = [python_bin, script_path, '--worker', '--engine', eng, '--tier', label]
+            if csv_path:
+                cmd.extend(['--csv', csv_path])
+                
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            if proc.returncode != 0:
+                print(f"❌ Error in worker {eng} ({label}):")
+                print(proc.stderr)
+                sys.exit(1)
+                
+            # Parse output json
+            out_lines = [l.strip() for l in proc.stdout.split('\n') if l.strip().startswith('{') and l.strip().endswith('}')]
+            if not out_lines:
+                print(f"❌ Could not parse JSON from worker: {proc.stdout}")
+                sys.exit(1)
+            res = json.loads(out_lines[-1])
+            results.append(res)
+            print(f"  {res['engine']:<25} | Time: {res['elapsed_sec']:>7.3f}s | Peak RSS: {res['peak_mem_mb']:>7.1f} MB | Throughput: {res['throughput_rps']:>10,} rec/s")
             
-        # 1. Pandas
-        print(f"  [1/3] Benchmarking Pandas (Vectorized In-Memory)...")
-        res_pandas = benchmark_engine('Pandas (In-Memory)', run_pandas_engine, df)
-        res_pandas['tier'] = label
-        results.append(res_pandas)
-        print(f"        Time: {res_pandas['elapsed_sec']:.3f}s | Peak RSS: {res_pandas['peak_mem_mb']:.1f} MB | Throughput: {res_pandas['throughput_rps']:,} rec/s")
-        
-        # 2. MapReduce
-        print(f"  [2/3] Benchmarking MapReduce Simulation (Multi-Process)...")
-        res_mr = benchmark_engine('MapReduce (Multi-Proc)', run_mapreduce_engine, df)
-        res_mr['tier'] = label
-        results.append(res_mr)
-        print(f"        Time: {res_mr['elapsed_sec']:.3f}s | Peak RSS: {res_mr['peak_mem_mb']:.1f} MB | Throughput: {res_mr['throughput_rps']:,} rec/s")
-        
-        # 3. Apache Spark Engine Simulation
-        print(f"  [3/3] Benchmarking Spark Simulation (Partitioned DAG)...")
-        res_spark = benchmark_engine('Spark (Partitioned DAG)', run_spark_simulation_engine, df)
-        res_spark['tier'] = label
-        results.append(res_spark)
-        print(f"        Time: {res_spark['elapsed_sec']:.3f}s | Peak RSS: {res_spark['peak_mem_mb']:.1f} MB | Throughput: {res_spark['throughput_rps']:,} rec/s")
-
-    # Tier 4: 10,000,000 Records Benchmark
-    if include_10m:
-        print("\n--- Tier: 10M (10,000,000 records Big Data Stress-Test) ---")
-        print("Executing streaming chunked execution with 10 DISTINCT chunks of 1M records each...")
-        
-        total_records = 10000000
-        chunk_size = 1000000
-        
-        # Benchmark Pandas on 10M streaming
-        print("  [1/3] Benchmarking Pandas on 10M records (Streaming distinct chunks)...")
-        gc.collect()
-        t0 = time.perf_counter()
-        start_rss = get_peak_rss_mb()
-        pandas_acc = None
-        for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=101):
-            c_agg = chunk_df.groupby(['platform', 'city']).agg({
-                'spend': 'sum', 'revenue': 'sum', 'impressions': 'sum', 'clicks': 'sum', 'conversions': 'sum'
-            }).reset_index()
-            pandas_acc = c_agg if pandas_acc is None else pd.concat([pandas_acc, c_agg]).groupby(['platform', 'city']).sum().reset_index()
-        t_pandas_10m = time.perf_counter() - t0
-        peak_p_10m = max(1.0, get_peak_rss_mb() - start_rss)
-        res_p_10m = {
-            'engine': 'Pandas (In-Memory)', 'records': total_records, 'tier': '10m',
-            'elapsed_sec': round(t_pandas_10m, 4), 'peak_mem_mb': round(peak_p_10m, 2),
-            'throughput_rps': int(total_records / t_pandas_10m), 'rows_output': len(pandas_acc)
-        }
-        results.append(res_p_10m)
-        print(f"        Time: {res_p_10m['elapsed_sec']:.3f}s | Peak RSS: {res_p_10m['peak_mem_mb']:.1f} MB | Throughput: {res_p_10m['throughput_rps']:,} rec/s")
-
-        # Benchmark MapReduce on 10M streaming
-        print("  [2/3] Benchmarking MapReduce on 10M records (Streaming distinct chunks)...")
-        gc.collect()
-        t0 = time.perf_counter()
-        start_rss = get_peak_rss_mb()
-        mr_global = defaultdict(lambda: [0.0, 0.0, 0, 0, 0])
-        for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=201):
-            c_mr = run_mapreduce_engine(chunk_df)
-            for _, r in c_mr.iterrows():
-                k = (r['platform'], r['city'])
-                acc = mr_global[k]
-                acc[0] += r['spend']
-                acc[1] += r['revenue']
-                acc[2] += r['impressions']
-                acc[3] += r['clicks']
-                acc[4] += r['conversions']
-        t_mr_10m = time.perf_counter() - t0
-        peak_mr_10m = max(1.0, get_peak_rss_mb() - start_rss)
-        res_mr_10m = {
-            'engine': 'MapReduce (Multi-Proc)', 'records': total_records, 'tier': '10m',
-            'elapsed_sec': round(t_mr_10m, 4), 'peak_mem_mb': round(peak_mr_10m, 2),
-            'throughput_rps': int(total_records / t_mr_10m), 'rows_output': len(mr_global)
-        }
-        results.append(res_mr_10m)
-        print(f"        Time: {res_mr_10m['elapsed_sec']:.3f}s | Peak RSS: {res_mr_10m['peak_mem_mb']:.1f} MB | Throughput: {res_mr_10m['throughput_rps']:,} rec/s")
-
-        # Benchmark Spark on 10M streaming
-        print("  [3/3] Benchmarking Spark Simulation on 10M records (Streaming distinct chunks)...")
-        gc.collect()
-        t0 = time.perf_counter()
-        start_rss = get_peak_rss_mb()
-        spark_acc = None
-        for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=301):
-            c_spark = run_spark_simulation_engine(chunk_df)
-            spark_acc = c_spark if spark_acc is None else pd.concat([spark_acc, c_spark]).groupby(['platform', 'city']).sum().reset_index()
-        t_spark_10m = time.perf_counter() - t0
-        peak_spark_10m = max(1.0, get_peak_rss_mb() - start_rss)
-        res_s_10m = {
-            'engine': 'Spark (Partitioned DAG)', 'records': total_records, 'tier': '10m',
-            'elapsed_sec': round(t_spark_10m, 4), 'peak_mem_mb': round(peak_spark_10m, 2),
-            'throughput_rps': int(total_records / t_spark_10m), 'rows_output': len(spark_acc)
-        }
-        results.append(res_s_10m)
-        print(f"        Time: {res_s_10m['elapsed_sec']:.3f}s | Peak RSS: {res_s_10m['peak_mem_mb']:.1f} MB | Throughput: {res_s_10m['throughput_rps']:,} rec/s")
-
     bench_df = pd.DataFrame(results)
     bench_df.to_csv(output_csv, index=False)
     
@@ -379,22 +379,22 @@ def run_full_benchmark(data_dir: str = 'data/raw', output_csv: str = 'data/proce
     for _, row in bench_df.iterrows():
         print(f"{row['tier'].upper():<10} {row['records']:>12,} {row['engine']:<25} {row['elapsed_sec']:>10.3f} {row['peak_mem_mb']:>15.1f} {row['throughput_rps']:>20,}")
     print("=" * 90)
-    print(f"Saved benchmark results to {output_csv}")
-    
-    # Honest Architectural Takeaway
-    print("\n💡 Architectural Takeaway:")
-    print("  1. Single-Node In-Memory: Pandas dominates on single-node datasets (<1GB) because vectorized")
-    print("     C operations incur zero IPC, process spawning, or distributed shuffle serialization overhead.")
-    print("  2. Distributed Systems Purpose: MapReduce and Spark are designed for horizontal cluster scaling,")
-    print("     fault tolerance, and out-of-core spill-to-disk when datasets exceed physical machine memory (>100GB).")
+    print(f"✓ Results exported to: {output_csv}\n")
     return bench_df
 
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description="Run Big Data Analytics Benchmark.")
-    parser.add_argument('--include-10m', action='store_true', default=False,
-                        help="Include 10M record stress test (generates distinct streaming chunks)")
+    parser = argparse.ArgumentParser(description="Big Data Marketing Framework Benchmark.")
+    parser.add_argument('--worker', action='store_true', help="Run single isolated worker process")
+    parser.add_argument('--engine', type=str, choices=['pandas', 'mapreduce', 'spark'], help="Target engine")
+    parser.add_argument('--tier', type=str, choices=['10k', '100k', '1m', '10m'], help="Target scale tier")
+    parser.add_argument('--csv', type=str, default=None, help="Path to CSV dataset")
+    parser.add_argument('--include-10m', action='store_true', default=True, help="Include 10M record stress benchmark")
+    parser.add_argument('--no-10m', dest='include_10m', action='store_false', help="Exclude 10M record stress benchmark")
     args = parser.parse_args()
-    run_full_benchmark(include_10m=args.include_10m)
-
+    
+    if args.worker:
+        worker_res = execute_isolated_worker(args.engine, args.tier, args.csv)
+        print(json.dumps(worker_res))
+    else:
+        run_full_benchmark(include_10m=args.include_10m)

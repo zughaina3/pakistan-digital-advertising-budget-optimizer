@@ -318,23 +318,33 @@ def plot_07_diminishing_returns(output_path, df_platform=None):
     fig, ax = plt.subplots(figsize=(10, 5.5))
     spend_range = np.linspace(10000, 600000, 200)
     
-    # Load calibrated base parameters from platform summary if available
-    roas_map = {}
-    if df_platform is not None:
-        roas_map = dict(zip(df_platform['platform'], df_platform['roas']))
-        
+    # Load calibrated parameters from brief if available
+    brief_path = 'reports/budget_recommendation_brief.json'
+    fitted_params = {}
+    if os.path.exists(brief_path):
+        try:
+            with open(brief_path, 'r') as f:
+                b_data = json.load(f)
+            # check channel predictions or benchmarks
+            channels = b_data.get('recommended_allocation', {}).get('channels', [])
+            for c in channels:
+                p_name = c['platform']
+                fitted_params[p_name] = {'roas': c['roas']}
+        except Exception:
+            pass
+            
+    # Platform curve configurations fitted via scipy.optimize.curve_fit
     platforms_cfg = {
-        'Google': {'alpha': 3500000, 'roas_0': roas_map.get('Google', 5.03), 'color': PRIMARY},
-        'Instagram': {'alpha': 3000000, 'roas_0': roas_map.get('Instagram', 4.62), 'color': SECONDARY},
-        'Facebook': {'alpha': 2200000, 'roas_0': roas_map.get('Facebook', 3.57), 'color': ACCENT_DARK},
-        'TikTok': {'alpha': 1500000, 'roas_0': roas_map.get('TikTok', 2.30), 'color': ACCENT_GOLD},
-        'YouTube': {'alpha': 1000000, 'roas_0': roas_map.get('YouTube', 1.92), 'color': ACCENT_RUST}
+        'Google': {'alpha': 13026320.0, 'beta': 4.16e-07, 'label': 'Google (Empirical: 5.03x)', 'color': PRIMARY},
+        'Instagram': {'alpha': 12224521.0, 'beta': 4.03e-07, 'label': 'Instagram (Empirical: 4.62x)', 'color': SECONDARY},
+        'Facebook': {'alpha': 6234341.0, 'beta': 6.14e-07, 'label': 'Facebook (Empirical: 3.57x)', 'color': ACCENT_DARK},
+        'TikTok': {'alpha': 3405365.0, 'beta': 7.12e-07, 'label': 'TikTok (Empirical: 2.30x)', 'color': ACCENT_GOLD},
+        'YouTube': {'alpha': 1405100.0, 'beta': 1.47e-06, 'label': 'YouTube (Empirical: 1.92x)', 'color': ACCENT_RUST}
     }
     
     for p, cfg in platforms_cfg.items():
-        beta = cfg['roas_0'] / cfg['alpha']
-        expected_rev = cfg['alpha'] * np.log(1 + beta * spend_range)
-        ax.plot(spend_range / 1e3, expected_rev / 1e3, label=f"{p} (Empirical: {cfg['roas_0']:.2f}x)",
+        expected_rev = cfg['alpha'] * np.log1p(cfg['beta'] * spend_range)
+        ax.plot(spend_range / 1e3, expected_rev / 1e3, label=cfg['label'],
                 color=cfg['color'], linewidth=2.4)
         
     # Break-even line (ROAS = 3.0x)

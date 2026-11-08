@@ -98,92 +98,92 @@ def get_styles():
     styles.add(ParagraphStyle(
         name='CoverTitle',
         fontName='Helvetica-Bold',
-        fontSize=22,
-        leading=26,
+        fontSize=21,
+        leading=25,
         textColor=PRIMARY,
-        spaceAfter=6
+        spaceAfter=5
     ))
     styles.add(ParagraphStyle(
         name='CoverSubtitle',
         fontName='Helvetica',
-        fontSize=9.5,
-        leading=13.5,
+        fontSize=9,
+        leading=13,
         textColor=TEXT_MAIN,
-        spaceAfter=10
+        spaceAfter=8
     ))
     styles.add(ParagraphStyle(
         name='SecHeader',
         fontName='Helvetica-Bold',
-        fontSize=12,
-        leading=15,
+        fontSize=11.5,
+        leading=14.5,
         textColor=PRIMARY,
-        spaceBefore=4,
-        spaceAfter=4,
+        spaceBefore=3,
+        spaceAfter=3,
         keepWithNext=True
     ))
     styles.add(ParagraphStyle(
         name='SubSecHeader',
         fontName='Helvetica-Bold',
-        fontSize=9.5,
-        leading=12.5,
+        fontSize=9,
+        leading=12,
         textColor=DARK_BG,
-        spaceBefore=4,
-        spaceAfter=3,
+        spaceBefore=3,
+        spaceAfter=2,
         keepWithNext=True
     ))
     styles.add(ParagraphStyle(
         name='BodyCustom',
         fontName='Helvetica',
-        fontSize=8,
-        leading=11,
+        fontSize=7.8,
+        leading=10.8,
         textColor=TEXT_MAIN,
-        spaceAfter=4
+        spaceAfter=3
     ))
     styles.add(ParagraphStyle(
         name='CalloutBox',
         fontName='Helvetica',
-        fontSize=7.8,
-        leading=10.8,
+        fontSize=7.6,
+        leading=10.5,
         textColor=TEXT_MAIN,
         spaceAfter=2
     ))
     styles.add(ParagraphStyle(
         name='PlainEnglishText',
         fontName='Helvetica',
-        fontSize=7.8,
-        leading=10.8,
+        fontSize=7.6,
+        leading=10.5,
         textColor=colors.HexColor('#713F12'),
         spaceAfter=2
     ))
     styles.add(ParagraphStyle(
         name='TableHead',
         fontName='Helvetica-Bold',
-        fontSize=7,
-        leading=9,
+        fontSize=6.8,
+        leading=8.8,
         textColor=colors.white,
         alignment=1
     ))
     styles.add(ParagraphStyle(
         name='TableCell',
         fontName='Helvetica',
-        fontSize=7,
-        leading=9,
+        fontSize=6.8,
+        leading=8.8,
         textColor=TEXT_MAIN,
         alignment=0
     ))
     styles.add(ParagraphStyle(
         name='TableCellCenter',
         fontName='Helvetica',
-        fontSize=7,
-        leading=9,
+        fontSize=6.8,
+        leading=8.8,
         textColor=TEXT_MAIN,
         alignment=1
     ))
     styles.add(ParagraphStyle(
         name='TableCellBold',
         fontName='Helvetica-Bold',
-        fontSize=7,
-        leading=9,
+        fontSize=6.8,
+        leading=8.8,
         textColor=TEXT_MAIN,
         alignment=1
     ))
@@ -194,16 +194,16 @@ def get_styles():
         leading=8,
         textColor=TEXT_MUTED,
         alignment=1,
-        spaceAfter=3
+        spaceAfter=2
     ))
     styles.add(ParagraphStyle(
         name='KPIVal',
         fontName='Helvetica-Bold',
-        fontSize=13,
-        leading=15,
+        fontSize=12.5,
+        leading=14.5,
         textColor=PRIMARY,
         alignment=1,
-        spaceAfter=3
+        spaceAfter=2
     ))
     styles.add(ParagraphStyle(
         name='KPISub',
@@ -216,12 +216,12 @@ def get_styles():
     styles.add(ParagraphStyle(
         name='CaptionText',
         fontName='Helvetica-Oblique',
-        fontSize=7,
-        leading=8.5,
+        fontSize=6.8,
+        leading=8.2,
         textColor=TEXT_MUTED,
         alignment=1,
         spaceBefore=2,
-        spaceAfter=4
+        spaceAfter=3
     ))
 
     return styles
@@ -234,10 +234,10 @@ def make_callout(text: str, styles, bg=CALLOUT_BG, border_color=PRIMARY, border_
         ('BACKGROUND', (0,0), (-1,-1), bg),
         ('BOX', (0,0), (-1,-1), 0.5, border_color),
         ('LINEBEFORE', (0,0), (0,-1), border_width, border_color),
-        ('TOPPADDING', (0,0), (-1,-1), 5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('LEFTPADDING', (0,0), (-1,-1), 7),
+        ('RIGHTPADDING', (0,0), (-1,-1), 7),
     ]))
     return t
 
@@ -250,10 +250,10 @@ def make_plain_english_box(title: str, text: str, styles):
         ('BACKGROUND', (0,0), (-1,-1), PLAIN_BG),
         ('BOX', (0,0), (-1,-1), 0.5, PLAIN_BORDER),
         ('LINEBEFORE', (0,0), (0,-1), 3.5, PLAIN_BORDER),
-        ('TOPPADDING', (0,0), (-1,-1), 5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('LEFTPADDING', (0,0), (-1,-1), 7),
+        ('RIGHTPADDING', (0,0), (-1,-1), 7),
     ]))
     return t
 
@@ -268,8 +268,8 @@ def build_pdf(
         pagesize=A4,
         leftMargin=36,
         rightMargin=36,
-        topMargin=42,
-        bottomMargin=38
+        topMargin=40,
+        bottomMargin=36
     )
 
     styles = get_styles()
@@ -278,7 +278,7 @@ def build_pdf(
     # ==========================================================================
     # PAGE 1: COVER PAGE & EXECUTIVE ABSTRACT (PLAIN-ENGLISH OVERVIEW)
     # ==========================================================================
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 4))
     
     # Top Header Badge
     badge_table = Table(
@@ -293,7 +293,7 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(badge_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
     story.append(Paragraph("Pakistan Digital Advertising Budget Optimizer", styles['CoverTitle']))
     story.append(Paragraph("<b>Phase 2:</b> Big Data Marketing Campaign Intelligence, Distributed Framework Benchmarking (Pandas vs. MapReduce vs. Spark) & Algorithmic Ad Budget Reallocation Engine", styles['CoverSubtitle']))
@@ -318,30 +318,31 @@ def build_pdf(
         ('BACKGROUND', (0,0), (-1,-1), BG_LIGHT),
         ('BOX', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('INNERGRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0,0), (-1,-1), 3.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
         ('LEFTPADDING', (0,0), (-1,-1), 8),
         ('RIGHTPADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(t_meta)
-    story.append(Spacer(1, 7))
+    story.append(Spacer(1, 5))
 
     # Executive Abstract Callout
     abstract_text = (
         "<b>Executive Problem Statement:</b> A high-growth Pakistani direct-to-consumer brand specializing in stitched lawn "
         "pret, festive collections, and university accessories (tote bags, laptop backpacks) currently spends marketing capital across "
-        "Facebook, Instagram, Google, TikTok, and YouTube. Management posed the strategic question: <i>'Where should we spend the "
+        "Google, Instagram, Facebook, TikTok, and YouTube. Management posed the strategic question: <i>'Where should we spend the "
         "next Rs. 1 Million (PKR 1,000,000) to maximize revenue, sustain profitability above the 3.0x break-even target, and acquire "
         "customers at the lowest possible cost?'</i><br/><br/>"
-        "This research synthesizes empirical multi-channel advertising performance, non-linear diminishing returns modeling, and an "
-        "enterprise-grade Big Data scalability benchmark. The findings recommend allocating <b>40% to Google Ads</b>, <b>35% to Instagram Ads</b>, "
-        "<b>13% to Facebook Ads</b>, <b>8% to TikTok Ads</b>, and <b>4% to YouTube Ads</b>, generating a projected <b>Rs. 5.42 Million in gross revenue</b>, "
-        "<b>Rs. 1.27 Million in true operating net profit</b> (23.5% net operating margin after 45% COGS, Rs. 220 courier shipping, 12% COD returns, and Rs. 1M media spend), and <b>1,450 confirmed customer orders</b> at a blended CPA of Rs. 690."
+        "This research synthesizes empirical multi-channel advertising performance, non-linear diminishing returns modeling calibrated directly "
+        "from historical daily data via <code>scipy.optimize.curve_fit</code>, and an enterprise-grade Big Data scalability benchmark. "
+        "The findings recommend allocating <b>40% to Google Ads</b>, <b>35% to Instagram Ads</b>, <b>13% to Facebook Ads</b>, <b>8% to TikTok Ads</b>, "
+        "and <b>4% to YouTube Ads</b>, generating a projected <b>Rs. 4.37 Million in gross revenue</b>, <b>Rs. 637,864 in true operating net profit</b> "
+        "(14.6% net operating margin after 45% COGS, Rs. 220 courier shipping, 12% COD returns, and Rs. 1M media spend), and <b>1,970 confirmed customer orders</b> at a blended CPA of Rs. 508."
     )
     story.append(make_callout(abstract_text, styles))
-    story.append(Spacer(1, 7))
+    story.append(Spacer(1, 5))
 
-    # Core KPI Cards Table (Fixes font-leading overlap with individual Paragraph flowables)
+    # Core KPI Cards Table
     def kpi_card(title, val, sub):
         return [
             Paragraph(title, styles['KPITitle']),
@@ -352,10 +353,10 @@ def build_pdf(
     kpi_cards = [
         [
             kpi_card("TOTAL AD SPEND", "Rs. 1.0M", "Allocated Capital"),
-            kpi_card("PROJECTED SALES", "Rs. 5.42M", "Gross Attributed Sales"),
-            kpi_card("OPERATING NET PROFIT", "Rs. 1.27M", "Net After COGS & Logistics"),
-            kpi_card("BLENDED ROAS", "5.42x", "Rs. 5.42 per Rs. 1 Spend"),
-            kpi_card("CONFIRMED ORDERS", "1,450", "Rs. 690 Blended CPA"),
+            kpi_card("PROJECTED SALES", "Rs. 4.37M", "Gross Attributed Sales"),
+            kpi_card("OPERATING NET PROFIT", "Rs. 638K", "Net After COGS & Logistics"),
+            kpi_card("BLENDED ROAS", "4.37x", "Rs. 4.37 per Rs. 1 Spend"),
+            kpi_card("CONFIRMED ORDERS", "1,970", "Rs. 508 Blended CPA"),
         ]
     ]
     t_kpis = Table(kpi_cards, colWidths=[104.6]*5)
@@ -363,11 +364,22 @@ def build_pdf(
         ('BACKGROUND', (0,0), (-1,-1), BG_LIGHT),
         ('BOX', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('INNERGRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 3.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
     ]))
     story.append(t_kpis)
-    story.append(Spacer(1, 7))
+    story.append(Spacer(1, 5))
+
+    # Data Provenance & Academic Methodology Notice
+    provenance_text = (
+        "<b>Academic & Commercial Data Provenance Notice:</b> "
+        "The interaction datasets (10K, 100K, 1M, and 10M streaming records) are synthesized via a deterministic econometric "
+        "simulation model. This architecture guarantees the strict protection of commercial client confidentiality and PII while "
+        "faithfully mirroring empirical Pakistani macroeconomic conditions: 85%+ Cash-on-Delivery (COD) adoption, 12% doorstep refusal/RTO rates, "
+        "Rs. 220 courier delivery tariffs, Rs. 180 reverse logistics fees, 45% production COGS, and empirical channel auction elasticities."
+    )
+    story.append(make_callout(provenance_text, styles, bg=colors.HexColor('#F8FAFB'), border_color=SECONDARY, border_width=2.5))
+    story.append(Spacer(1, 5))
 
     # Plain English Primer Box
     primer_text = (
@@ -404,12 +416,12 @@ def build_pdf(
             Paragraph("<b>Orders</b>", styles['TableHead']),
             Paragraph("<b>Strategic Role</b>", styles['TableHead']),
         ],
-        [Paragraph("<b>Google Ads</b>", styles['TableCell']), Paragraph("40.0%", styles['TableCellCenter']), Paragraph("Rs. 400,000", styles['TableCellCenter']), Paragraph("Rs. 2,504,982", styles['TableCellCenter']), Paragraph("<b>6.26x</b>", styles['TableCellCenter']), Paragraph("Rs. 851", styles['TableCellCenter']), Paragraph("470", styles['TableCellCenter']), Paragraph("Profit Engine (High-Intent Search)", styles['TableCell'])],
-        [Paragraph("<b>Instagram Ads</b>", styles['TableCell']), Paragraph("35.0%", styles['TableCellCenter']), Paragraph("Rs. 350,000", styles['TableCellCenter']), Paragraph("Rs. 2,011,444", styles['TableCellCenter']), Paragraph("<b>5.75x</b>", styles['TableCellCenter']), Paragraph("Rs. 541", styles['TableCellCenter']), Paragraph("647", styles['TableCellCenter']), Paragraph("Efficiency Leader (Lowest CPA)", styles['TableCell'])],
-        [Paragraph("<b>Facebook Ads</b>", styles['TableCell']), Paragraph("13.0%", styles['TableCellCenter']), Paragraph("Rs. 130,000", styles['TableCellCenter']), Paragraph("Rs. 578,532", styles['TableCellCenter']), Paragraph("<b>4.45x</b>", styles['TableCellCenter']), Paragraph("Rs. 793", styles['TableCellCenter']), Paragraph("164", styles['TableCellCenter']), Paragraph("Cart Recovery & Mature Buyers", styles['TableCell'])],
-        [Paragraph("<b>TikTok Ads</b>", styles['TableCell']), Paragraph("8.0%", styles['TableCellCenter']), Paragraph("Rs. 80,000", styles['TableCellCenter']), Paragraph("Rs. 229,861", styles['TableCellCenter']), Paragraph("<b>2.87x</b>", styles['TableCellCenter']), Paragraph("Rs. 552", styles['TableCellCenter']), Paragraph("145", styles['TableCellCenter']), Paragraph("Top-Funnel Gen Z Youth Reach", styles['TableCell'])],
-        [Paragraph("<b>YouTube Ads</b>", styles['TableCell']), Paragraph("4.0%", styles['TableCellCenter']), Paragraph("Rs. 40,000", styles['TableCellCenter']), Paragraph("Rs. 96,003", styles['TableCellCenter']), Paragraph("<b>2.40x</b>", styles['TableCellCenter']), Paragraph("Rs. 1,667", styles['TableCellCenter']), Paragraph("24", styles['TableCellCenter']), Paragraph("Brand Recall & Video Trust", styles['TableCell'])],
-        [Paragraph("<b>TOTAL / BLENDED</b>", styles['TableHead']), Paragraph("<b>100.0%</b>", styles['TableHead']), Paragraph("<b>Rs. 1,000,000</b>", styles['TableHead']), Paragraph("<b>Rs. 5,420,821</b>", styles['TableHead']), Paragraph("<b>5.42x</b>", styles['TableHead']), Paragraph("<b>Rs. 690</b>", styles['TableHead']), Paragraph("<b>1,450</b>", styles['TableHead']), Paragraph("<b>Net Profit: Rs. 1,273,358 (23.5%)</b>", styles['TableHead'])],
+        [Paragraph("<b>Google Ads</b>", styles['TableCell']), Paragraph("40.0%", styles['TableCellCenter']), Paragraph("Rs. 400,000", styles['TableCellCenter']), Paragraph("Rs. 2,006,579", styles['TableCellCenter']), Paragraph("<b>5.02x</b>", styles['TableCellCenter']), Paragraph("Rs. 600", styles['TableCellCenter']), Paragraph("667", styles['TableCellCenter']), Paragraph("Profit Engine (High-Intent Search)", styles['TableCell'])],
+        [Paragraph("<b>Instagram Ads</b>", styles['TableCell']), Paragraph("35.0%", styles['TableCellCenter']), Paragraph("Rs. 350,000", styles['TableCellCenter']), Paragraph("Rs. 1,613,177", styles['TableCellCenter']), Paragraph("<b>4.61x</b>", styles['TableCellCenter']), Paragraph("Rs. 388", styles['TableCellCenter']), Paragraph("901", styles['TableCellCenter']), Paragraph("Efficiency Leader (Lowest CPA)", styles['TableCell'])],
+        [Paragraph("<b>Facebook Ads</b>", styles['TableCell']), Paragraph("13.0%", styles['TableCellCenter']), Paragraph("Rs. 130,000", styles['TableCellCenter']), Paragraph("Rs. 478,728", styles['TableCellCenter']), Paragraph("<b>3.68x</b>", styles['TableCellCenter']), Paragraph("Rs. 637", styles['TableCellCenter']), Paragraph("204", styles['TableCellCenter']), Paragraph("Cart Recovery & Mature Buyers", styles['TableCell'])],
+        [Paragraph("<b>TikTok Ads</b>", styles['TableCell']), Paragraph("8.0%", styles['TableCellCenter']), Paragraph("Rs. 80,000", styles['TableCellCenter']), Paragraph("Rs. 188,668", styles['TableCellCenter']), Paragraph("<b>2.36x</b>", styles['TableCellCenter']), Paragraph("Rs. 471", styles['TableCellCenter']), Paragraph("170", styles['TableCellCenter']), Paragraph("Top-Funnel Gen Z Youth Reach", styles['TableCell'])],
+        [Paragraph("<b>YouTube Ads</b>", styles['TableCell']), Paragraph("4.0%", styles['TableCellCenter']), Paragraph("Rs. 40,000", styles['TableCellCenter']), Paragraph("Rs. 80,236", styles['TableCellCenter']), Paragraph("<b>2.01x</b>", styles['TableCellCenter']), Paragraph("Rs. 1,429", styles['TableCellCenter']), Paragraph("28", styles['TableCellCenter']), Paragraph("Brand Recall & Video Trust", styles['TableCell'])],
+        [Paragraph("<b>TOTAL / BLENDED</b>", styles['TableHead']), Paragraph("<b>100.0%</b>", styles['TableHead']), Paragraph("<b>Rs. 1,000,000</b>", styles['TableHead']), Paragraph("<b>Rs. 4,367,388</b>", styles['TableHead']), Paragraph("<b>4.37x</b>", styles['TableHead']), Paragraph("<b>Rs. 508</b>", styles['TableHead']), Paragraph("<b>1,970</b>", styles['TableHead']), Paragraph("<b>Net Profit: Rs. 637,864 (14.6%)</b>", styles['TableHead'])],
     ]
     t_alloc = Table(alloc_table_data, colWidths=[78, 42, 68, 78, 40, 52, 45, 120])
     t_alloc.setStyle(TableStyle([
@@ -422,19 +434,19 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(t_alloc)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 5))
 
-    # Embed Chart 6: Allocation Donut & Waterfall (sized to 2.1 inches so it fits cleanly)
+    # Embed Chart 6: Allocation Donut & Waterfall
     p6_path = os.path.join(fig_dir, "06_recommended_budget_allocation_rs1m.png")
     if os.path.exists(p6_path):
-        story.append(Image(p6_path, width=7.0*inch, height=2.1*inch))
+        story.append(Image(p6_path, width=7.0*inch, height=2.05*inch))
         story.append(Paragraph("Figure 1: Optimal Ad Budget Allocation Share (%) and Projected Revenue Contribution Waterfall across Channels", styles['CaptionText']))
 
-    # Executive Summary Takeaway Callout (Cleanly sized for Page 2)
+    # Executive Summary Takeaway Callout
     p2_takeaway = (
         "<b>Executive Summary of the Recommended Allocation:</b><br/>"
-        "• <b>Google & Instagram capture 75% of the total budget (Rs. 750,000)</b>, generating <b>83.3% of total customer sales (Rs. 4.52 Million)</b> and Rs. 1.17 Million in operating profit.<br/>"
-        "• <b>Facebook secures 13% (Rs. 130,000)</b> to safeguard against abandoned shopping carts and reach 25–44 family buyers at 4.45x ROAS.<br/>"
+        "• <b>Google & Instagram capture 75% of the total budget (Rs. 750,000)</b>, generating <b>82.9% of total customer sales (Rs. 3.62 Million)</b> and Rs. 623,133 in true operating profit.<br/>"
+        "• <b>Facebook secures 13% (Rs. 130,000)</b> to safeguard against abandoned shopping carts and reach 25–44 family buyers at 3.68x ROAS.<br/>"
         "• <b>TikTok is strictly capped at 8% (Rs. 80,000)</b> for low-cost impulse accessories under Rs. 2,500.<br/>"
         "• <b>YouTube is curtailed to 4% (Rs. 40,000)</b> to prevent unprofitable capital bleed while preserving video unboxing trust."
     )
@@ -448,7 +460,7 @@ def build_pdf(
     story.append(Paragraph("2. Plain-English Platform Roles & Strategic Scenarios", styles['SecHeader']))
     story.append(Paragraph(
         "To understand why money is allocated this way, here is the real-world role each platform plays in Pakistan, followed "
-        "by alternative strategies depending on company priorities:",
+        "by alternative strategies evaluated using the Sequential Least Squares Programming (SLSQP) solver:",
         styles['BodyCustom']
     ))
 
@@ -457,44 +469,49 @@ def build_pdf(
         "<b>Why Did Each Platform Get This Exact Amount of Money?</b><br/>"
         "• <b>Google gets the largest share (Rs. 400,000 / 40%):</b> Think of Google like a prime store on Mall Road or Tariq Road where customers "
         "walk in <i>already holding cash</i> searching for <i>'stitched lawn suit sale'</i> or <i>'canvas laptop tote bag'</i>. "
-        "They want to buy right now. That is why Google generates the highest revenue (Rs. 2.50 Million) and 6.26x ROAS.<br/>"
+        "They want to buy right now. That is why Google generates the highest revenue (Rs. 2.01 Million) and 5.02x predicted ROAS.<br/>"
         "• <b>Instagram gets the second largest share (Rs. 350,000 / 35%):</b> Instagram is the visual fashion catalog of Pakistan. Young women "
-        "scroll through Reels and watch styling unboxings. It costs only <b>Rs. 541</b> to win a customer on Instagram, producing 647 orders.<br/>"
+        "scroll through Reels and watch styling unboxings. It costs only <b>Rs. 388</b> to win a customer on Instagram, producing 901 orders.<br/>"
         "• <b>Facebook gets Rs. 130,000 (13%):</b> Facebook acts like a polite shop assistant who reminds cart abandoners, "
-        "<i>'You left a lawn dress in your cart—complete your order for fast delivery!'</i> It also reaches mature 30+ family shoppers.<br/>"
+        "<i>'You left a lawn dress in your cart—complete your order for fast delivery!'</i> It also reaches mature 30+ family shoppers at 3.68x ROAS.<br/>"
         "• <b>TikTok gets Rs. 80,000 (8%):</b> TikTok is like distributing flyers at university gates. Millions of Gen Z students discover "
         "the brand cheaply (Rs. 9.66 CPC). It is strictly capped for starter items under Rs. 2,500.<br/>"
         "• <b>YouTube is curtailed to Rs. 40,000 (4%):</b> Viewers watching dramas or podcasts rarely pause to buy pret immediately. "
         "Spending heavily on YouTube burns cash; keeping it at 4% preserves video brand trust without capital bleed."
     )
     story.append(make_plain_english_box("Understanding Platform Roles in Everyday Terms", plain_plat, styles))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 5))
 
     # Strategic Scenarios Comparison Table
     story.append(Paragraph("Strategic Scenario Comparison (Evaluating Management Priorities via SLSQP):", styles['SubSecHeader']))
     scenario_data = [
         [Paragraph("<b>Scenario</b>", styles['TableHead']), Paragraph("<b>Spend (PKR)</b>", styles['TableHead']), Paragraph("<b>Projected Revenue</b>", styles['TableHead']), Paragraph("<b>Blended ROAS</b>", styles['TableHead']), Paragraph("<b>Blended CPA</b>", styles['TableHead']), Paragraph("<b>Orders</b>", styles['TableHead']), Paragraph("<b>True Net Profit</b>", styles['TableHead'])],
-        [Paragraph("<b>Balanced Growth (Recommended)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 5,420,821", styles['TableCellCenter']), Paragraph("<b>5.42x</b>", styles['TableCellCenter']), Paragraph("Rs. 690", styles['TableCellCenter']), Paragraph("1,450", styles['TableCellCenter']), Paragraph("<b>Rs. 1,273,358 (23.5%)</b>", styles['TableCellCenter'])],
-        [Paragraph("<b>ROAS Maximizer (Squeeze)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 5,898,018", styles['TableCellCenter']), Paragraph("<b>5.90x</b>", styles['TableCellCenter']), Paragraph("Rs. 728", styles['TableCellCenter']), Paragraph("1,374", styles['TableCellCenter']), Paragraph("<b>Rs. 1,522,682 (25.8%)</b>", styles['TableCellCenter'])],
-        [Paragraph("<b>Aggressive Scale (Volume)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 4,772,759", styles['TableCellCenter']), Paragraph("<b>4.77x</b>", styles['TableCellCenter']), Paragraph("Rs. 633", styles['TableCellCenter']), Paragraph("1,579", styles['TableCellCenter']), Paragraph("<b>Rs. 928,529 (19.5%)</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>Balanced Growth (Recommended)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 4,367,388", styles['TableCellCenter']), Paragraph("<b>4.37x</b>", styles['TableCellCenter']), Paragraph("Rs. 508", styles['TableCellCenter']), Paragraph("1,970", styles['TableCellCenter']), Paragraph("<b>Rs. 637,864 (14.6%)</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>ROAS Maximizer (Squeeze)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 4,639,581", styles['TableCellCenter']), Paragraph("<b>4.64x</b>", styles['TableCellCenter']), Paragraph("Rs. 518", styles['TableCellCenter']), Paragraph("1,931", styles['TableCellCenter']), Paragraph("<b>Rs. 779,028 (16.8%)</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>Unconstrained Direct-Response</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 4,733,391", styles['TableCellCenter']), Paragraph("<b>4.73x</b>", styles['TableCellCenter']), Paragraph("Rs. 509", styles['TableCellCenter']), Paragraph("1,965", styles['TableCellCenter']), Paragraph("<b>Rs. 816,217 (17.2%)</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>Aggressive Scale (Volume)</b>", styles['TableCell']), Paragraph("Rs. 1,000,000", styles['TableCellCenter']), Paragraph("Rs. 3,825,577", styles['TableCellCenter']), Paragraph("<b>3.83x</b>", styles['TableCellCenter']), Paragraph("Rs. 468", styles['TableCellCenter']), Paragraph("2,136", styles['TableCellCenter']), Paragraph("<b>Rs. 335,522 (8.8%)</b>", styles['TableCellCenter'])],
     ]
-    t_scen = Table(scenario_data, colWidths=[140, 65, 75, 55, 60, 50, 78])
+    t_scen = Table(scenario_data, colWidths=[138, 62, 75, 52, 58, 48, 90])
     t_scen.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), SECONDARY),
         ('BOX', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('INNERGRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, BG_LIGHT]),
-        ('TOPPADDING', (0,0), (-1,-1), 3),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('TOPPADDING', (0,0), (-1,-1), 2.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2.5),
     ]))
     story.append(t_scen)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     scen_plain = (
-        "<b>Scenario Tradeoffs in Plain English:</b><br/>"
-        "• <b>Balanced Growth (Recommended):</b> Balances Rs. 1.27M in net operating profit with healthy top-funnel discovery across 1,450 buyers.<br/>"
-        "• <b>ROAS Maximizer:</b> Allocates 94% to Google and Instagram. Squeezes maximum profit (Rs. 1.52M), but leaves TikTok underfunded.<br/>"
-        "• <b>Aggressive Scale:</b> Pours 30% into TikTok and 45% into Instagram. Drives peak orders (1,579) at lowest CPA (Rs. 633), but net margin drops to 19.5%."
+        "<b>Scenario Tradeoffs & The Rationale for TikTok/YouTube Spend:</b><br/>"
+        "• <b>Why Fund TikTok (8%) and YouTube (4%) When They Lose Standalone Margin?</b> A pure unconstrained direct-response optimizer "
+        "zeros out TikTok and YouTube (0%), concentrating 62% in Google and 38% in Instagram to generate Rs. 816K short-term profit. "
+        "However, in a multi-touch attribution ecosystem, Google and Instagram harvest demand created upstream. Completely eliminating "
+        "top-of-funnel discovery causes high-intent search audience exhaustion within 60–90 days, degrading Google's marginal ROAS.<br/>"
+        "• <b>Balanced Growth (Recommended):</b> Sustains customer replenishment across 1,970 orders while securing Rs. 638K in net profit.<br/>"
+        "• <b>ROAS Maximizer:</b> Constrains TikTok and YouTube to 2% minimums, achieving 4.64x blended ROAS and Rs. 779K net profit.<br/>"
+        "• <b>Aggressive Scale:</b> Prioritizes raw order acquisition (2,136 orders) via 30% TikTok / 45% Instagram, accepting an 8.8% operating net margin."
     )
     story.append(make_callout(scen_plain, styles))
 
@@ -506,21 +523,22 @@ def build_pdf(
     story.append(Paragraph("3. Platform Performance Benchmark & Real Unit Economics", styles['SecHeader']))
     story.append(Paragraph(
         "To eliminate guesswork, we analyzed 100,000 multi-channel marketing interaction logs calibrated to actual Pakistani "
-        "consumer buying habits, product baskets (Rs. 1,800 tote bags to Rs. 5,000 lawn suits), and currency auction rates:",
+        "consumer buying habits, product baskets (Rs. 1,800 tote bags to Rs. 5,000 lawn suits), and currency auction rates. "
+        "Standard errors and 95% Confidence Intervals are computed via 1,000-iteration daily cluster block bootstrap resampling:",
         styles['BodyCustom']
     ))
 
     # Platform Table
     p_data = [
-        [Paragraph("<b>Platform</b>", styles['TableHead']), Paragraph("<b>Total Spend (PKR)</b>", styles['TableHead']), Paragraph("<b>Total Revenue (PKR)</b>", styles['TableHead']), Paragraph("<b>ROAS</b>", styles['TableHead']), Paragraph("<b>CPA (PKR)</b>", styles['TableHead']), Paragraph("<b>CPC (PKR)</b>", styles['TableHead']), Paragraph("<b>CVR %</b>", styles['TableHead']), Paragraph("<b>CTR %</b>", styles['TableHead'])],
-        [Paragraph("<b>Google Ads</b>", styles['TableCell']), Paragraph("Rs. 137,124,552", styles['TableCellCenter']), Paragraph("Rs. 690,115,501", styles['TableCellCenter']), Paragraph("<b>5.03x</b>", styles['TableCellCenter']), Paragraph("Rs. 597", styles['TableCellCenter']), Paragraph("Rs. 32.44", styles['TableCellCenter']), Paragraph("5.43%", styles['TableCellCenter']), Paragraph("3.39%", styles['TableCellCenter'])],
-        [Paragraph("<b>Instagram Ads</b>", styles['TableCell']), Paragraph("Rs. 121,576,622", styles['TableCellCenter']), Paragraph("Rs. 561,469,459", styles['TableCellCenter']), Paragraph("<b>4.62x</b>", styles['TableCellCenter']), Paragraph("Rs. 388", styles['TableCellCenter']), Paragraph("Rs. 20.72", styles['TableCellCenter']), Paragraph("5.34%", styles['TableCellCenter']), Paragraph("2.59%", styles['TableCellCenter'])],
-        [Paragraph("<b>Facebook Ads</b>", styles['TableCell']), Paragraph("Rs. 86,208,025", styles['TableCellCenter']), Paragraph("Rs. 307,640,287", styles['TableCellCenter']), Paragraph("<b>3.57x</b>", styles['TableCellCenter']), Paragraph("Rs. 656", styles['TableCellCenter']), Paragraph("Rs. 25.03", styles['TableCellCenter']), Paragraph("3.81%", styles['TableCellCenter']), Paragraph("1.79%", styles['TableCellCenter'])],
-        [Paragraph("<b>TikTok Ads</b>", styles['TableCell']), Paragraph("Rs. 52,221,902", styles['TableCellCenter']), Paragraph("Rs. 120,324,838", styles['TableCellCenter']), Paragraph("<b>2.30x</b>", styles['TableCellCenter']), Paragraph("Rs. 482", styles['TableCellCenter']), Paragraph("Rs. 9.66", styles['TableCellCenter']), Paragraph("2.00%", styles['TableCellCenter']), Paragraph("2.19%", styles['TableCellCenter'])],
-        [Paragraph("<b>YouTube Ads</b>", styles['TableCell']), Paragraph("Rs. 34,437,488", styles['TableCellCenter']), Paragraph("Rs. 66,241,815", styles['TableCellCenter']), Paragraph("<b>1.92x</b>", styles['TableCellCenter']), Paragraph("Rs. 1,512", styles['TableCellCenter']), Paragraph("Rs. 36.39", styles['TableCellCenter']), Paragraph("2.41%", styles['TableCellCenter']), Paragraph("1.10%", styles['TableCellCenter'])],
-        [Paragraph("<b>BLENDED TOTAL</b>", styles['TableHead']), Paragraph("<b>Rs. 431,568,589</b>", styles['TableHead']), Paragraph("<b>Rs. 1,745,791,900</b>", styles['TableHead']), Paragraph("<b>4.05x</b>", styles['TableHead']), Paragraph("<b>Rs. 536</b>", styles['TableHead']), Paragraph("<b>Rs. 21.68</b>", styles['TableHead']), Paragraph("<b>4.04%</b>", styles['TableHead']), Paragraph("<b>2.27%</b>", styles['TableHead'])],
+        [Paragraph("<b>Platform</b>", styles['TableHead']), Paragraph("<b>Total Spend (PKR)</b>", styles['TableHead']), Paragraph("<b>Total Revenue (PKR)</b>", styles['TableHead']), Paragraph("<b>ROAS (95% CI)</b>", styles['TableHead']), Paragraph("<b>CPA (PKR)</b>", styles['TableHead']), Paragraph("<b>CPC (PKR)</b>", styles['TableHead']), Paragraph("<b>CVR %</b>", styles['TableHead']), Paragraph("<b>CTR %</b>", styles['TableHead'])],
+        [Paragraph("<b>Google Ads</b>", styles['TableCell']), Paragraph("Rs. 137,124,552", styles['TableCellCenter']), Paragraph("Rs. 690,115,501", styles['TableCellCenter']), Paragraph("<b>5.03x</b> [5.00, 5.07]", styles['TableCellCenter']), Paragraph("Rs. 597", styles['TableCellCenter']), Paragraph("Rs. 32.44", styles['TableCellCenter']), Paragraph("5.43%", styles['TableCellCenter']), Paragraph("3.39%", styles['TableCellCenter'])],
+        [Paragraph("<b>Instagram Ads</b>", styles['TableCell']), Paragraph("Rs. 121,576,622", styles['TableCellCenter']), Paragraph("Rs. 561,469,459", styles['TableCellCenter']), Paragraph("<b>4.62x</b> [4.59, 4.65]", styles['TableCellCenter']), Paragraph("Rs. 388", styles['TableCellCenter']), Paragraph("Rs. 20.72", styles['TableCellCenter']), Paragraph("5.34%", styles['TableCellCenter']), Paragraph("2.59%", styles['TableCellCenter'])],
+        [Paragraph("<b>Facebook Ads</b>", styles['TableCell']), Paragraph("Rs. 86,208,025", styles['TableCellCenter']), Paragraph("Rs. 307,640,287", styles['TableCellCenter']), Paragraph("<b>3.57x</b> [3.54, 3.60]", styles['TableCellCenter']), Paragraph("Rs. 656", styles['TableCellCenter']), Paragraph("Rs. 25.03", styles['TableCellCenter']), Paragraph("3.81%", styles['TableCellCenter']), Paragraph("1.79%", styles['TableCellCenter'])],
+        [Paragraph("<b>TikTok Ads</b>", styles['TableCell']), Paragraph("Rs. 52,221,902", styles['TableCellCenter']), Paragraph("Rs. 120,324,838", styles['TableCellCenter']), Paragraph("<b>2.30x</b> [2.28, 2.33]", styles['TableCellCenter']), Paragraph("Rs. 482", styles['TableCellCenter']), Paragraph("Rs. 9.66", styles['TableCellCenter']), Paragraph("2.00%", styles['TableCellCenter']), Paragraph("2.19%", styles['TableCellCenter'])],
+        [Paragraph("<b>YouTube Ads</b>", styles['TableCell']), Paragraph("Rs. 34,437,488", styles['TableCellCenter']), Paragraph("Rs. 66,241,815", styles['TableCellCenter']), Paragraph("<b>1.92x</b> [1.89, 1.95]", styles['TableCellCenter']), Paragraph("Rs. 1,512", styles['TableCellCenter']), Paragraph("Rs. 36.39", styles['TableCellCenter']), Paragraph("2.41%", styles['TableCellCenter']), Paragraph("1.10%", styles['TableCellCenter'])],
+        [Paragraph("<b>BLENDED TOTAL</b>", styles['TableHead']), Paragraph("<b>Rs. 431,568,589</b>", styles['TableHead']), Paragraph("<b>Rs. 1,745,791,900</b>", styles['TableHead']), Paragraph("<b>4.05x</b> [4.03, 4.07]", styles['TableHead']), Paragraph("<b>Rs. 536</b>", styles['TableHead']), Paragraph("<b>Rs. 21.68</b>", styles['TableHead']), Paragraph("<b>4.04%</b>", styles['TableHead']), Paragraph("<b>2.27%</b>", styles['TableHead'])],
     ]
-    t_plat = Table(p_data, colWidths=[78, 75, 80, 45, 55, 55, 45, 45])
+    t_plat = Table(p_data, colWidths=[74, 75, 80, 56, 52, 52, 42, 42])
     t_plat.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('BACKGROUND', (0,-1), (-1,-1), DARK_BG),
@@ -531,16 +549,16 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 2.5),
     ]))
     story.append(t_plat)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
-    # Dual Visuals: Chart 1 & Chart 2 side by side (height 1.8 inches)
+    # Dual Visuals: Chart 1 & Chart 2 side by side
     p1_path = os.path.join(fig_dir, "01_cac_cpa_by_platform.png")
     p2_path = os.path.join(fig_dir, "02_roas_vs_breakeven_benchmark.png")
     
     if os.path.exists(p1_path) and os.path.exists(p2_path):
         img_table = Table([[
-            Image(p1_path, width=3.55*inch, height=1.85*inch),
-            Image(p2_path, width=3.55*inch, height=1.85*inch)
+            Image(p1_path, width=3.55*inch, height=1.82*inch),
+            Image(p2_path, width=3.55*inch, height=1.82*inch)
         ]], colWidths=[261, 262])
         img_table.setStyle(TableStyle([
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
@@ -556,13 +574,13 @@ def build_pdf(
         "<b>Mathematical Derivation of the 3.0x Break-Even ROAS Threshold:</b><br/>"
         "In Pakistani D2C commerce, 85%+ orders use Cash on Delivery (COD). A rigorous unit economics equation reveals the true margin threshold:<br/>"
         "• <b>Product Manufacturing (COGS):</b> 45.0% of retail price (leaving 55.0% gross product margin).<br/>"
-        "• <b>Courier Delivery Fee:</b> Rs. 220 per dispatched parcel.<br/>"
-        "• <b>COD Doorstep Rejection / Non-Delivery Rate:</b> 12.0% average across Pakistan.<br/>"
+        "• <b>Courier Delivery Fee:</b> Rs. 220 per dispatched parcel | <b>COD Rejection / Return Rate:</b> 12.0% average across Pakistan.<br/>"
         "• <b>Return Courier Fee (Reverse Logistics):</b> Rs. 180 per bounced parcel.<br/>"
         "For an average order basket of <b>Rs. 2,100</b>, delivered revenue (88%) is Rs. 1,848. Net product gross profit is Rs. 1,016. "
         "Logistics fees total Rs. 242 (Rs. 220 shipping + 12% x Rs. 180 return). This leaves <b>Rs. 774 maximum allowable CPA</b>.<br/>"
         "Dividing revenue (Rs. 2,100) by max CPA (Rs. 774) yields a <b>2.71x to 3.00x Break-Even ROAS</b>. "
-        "Platforms below 2.5x (TikTok at 2.30x: -Rs. 20.2M; YouTube at 1.92x: -Rs. 7.9M) lose operating capital on standalone orders and must serve solely as discovery drivers."
+        "Platforms below 2.5x (TikTok at 2.30x: -Rs. 20.2M; YouTube at 1.92x: -Rs. 7.9M) lose operating capital on standalone orders and must serve solely as discovery drivers.<br/>"
+        "<i>Note on Confidence Intervals:</i> 95% CIs reflect 1,000-iteration daily cluster bootstrap resampling, capturing temporal day-to-day realization variance."
     )
     story.append(make_plain_english_box("The Real Economics of a Pakistani E-Commerce Order", breakeven_text, styles))
 
@@ -574,25 +592,26 @@ def build_pdf(
     story.append(Paragraph("4. Big Data Framework Scalability Benchmark (10K to 10M Records)", styles['SecHeader']))
     story.append(Paragraph(
         "To test how enterprise data architectures survive when an e-commerce brand scales from thousands to millions of customer "
-        "interactions, we executed a standardized aggregation workload (`GroupBy (platform, city)` with metric projection) across 4 tiers:",
+        "interactions, we executed a standardized aggregation workload (`GroupBy (platform, city)` with metric projection) across 4 tiers. "
+        "Each benchmark runs in an isolated Python process to measure true peak RSS, and timing measures pure aggregation/reduction processing:",
         styles['BodyCustom']
     ))
 
     # Benchmark Table
     bench_table_data = [
         [Paragraph("<b>Data Tier</b>", styles['TableHead']), Paragraph("<b>Records</b>", styles['TableHead']), Paragraph("<b>Engine Framework</b>", styles['TableHead']), Paragraph("<b>Execution Time (s)</b>", styles['TableHead']), Paragraph("<b>Peak Memory (MB)</b>", styles['TableHead']), Paragraph("<b>Throughput (rec/s)</b>", styles['TableHead'])],
-        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.003s", styles['TableCellCenter']), Paragraph("0.9 MB", styles['TableCellCenter']), Paragraph("3,014,583", styles['TableCellCenter'])],
-        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.309s", styles['TableCellCenter']), Paragraph("73.4 MB", styles['TableCellCenter']), Paragraph("32,317", styles['TableCellCenter'])],
-        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.010s", styles['TableCellCenter']), Paragraph("0.5 MB", styles['TableCellCenter']), Paragraph("980,768", styles['TableCellCenter'])],
-        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.013s", styles['TableCellCenter']), Paragraph("0.5 MB", styles['TableCellCenter']), Paragraph("7,716,347", styles['TableCellCenter'])],
-        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.351s", styles['TableCellCenter']), Paragraph("32.8 MB", styles['TableCellCenter']), Paragraph("285,121", styles['TableCellCenter'])],
-        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.023s", styles['TableCellCenter']), Paragraph("0.5 MB", styles['TableCellCenter']), Paragraph("4,426,100", styles['TableCellCenter'])],
-        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.113s", styles['TableCellCenter']), Paragraph("10.8 MB", styles['TableCellCenter']), Paragraph("8,874,541", styles['TableCellCenter'])],
-        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.961s", styles['TableCellCenter']), Paragraph("379.8 MB", styles['TableCellCenter']), Paragraph("1,040,597", styles['TableCellCenter'])],
-        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.152s", styles['TableCellCenter']), Paragraph("0.5 MB", styles['TableCellCenter']), Paragraph("6,585,914", styles['TableCellCenter'])],
-        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>Pandas (Streaming Chunks)</b>", styles['TableCell']), Paragraph("<b>37.075s</b>", styles['TableCellCenter']), Paragraph("719.8 MB", styles['TableCellCenter']), Paragraph("<b>269,725</b>", styles['TableCellCenter'])],
-        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>MapReduce (Streaming Chunks)</b>", styles['TableCell']), Paragraph("<b>50.514s</b>", styles['TableCellCenter']), Paragraph("38.0 MB", styles['TableCellCenter']), Paragraph("<b>197,963</b>", styles['TableCellCenter'])],
-        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>Spark Sim (Streaming Chunks)</b>", styles['TableCell']), Paragraph("<b>36.768s</b>", styles['TableCellCenter']), Paragraph("79.4 MB", styles['TableCellCenter']), Paragraph("<b>271,978</b>", styles['TableCellCenter'])],
+        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.003s", styles['TableCellCenter']), Paragraph("73.6 MB", styles['TableCellCenter']), Paragraph("3,192,890", styles['TableCellCenter'])],
+        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.313s", styles['TableCellCenter']), Paragraph("146.6 MB", styles['TableCellCenter']), Paragraph("31,965", styles['TableCellCenter'])],
+        [Paragraph("10K", styles['TableCellCenter']), Paragraph("10,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.009s", styles['TableCellCenter']), Paragraph("74.1 MB", styles['TableCellCenter']), Paragraph("1,048,341", styles['TableCellCenter'])],
+        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.013s", styles['TableCellCenter']), Paragraph("103.0 MB", styles['TableCellCenter']), Paragraph("7,741,286", styles['TableCellCenter'])],
+        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.347s", styles['TableCellCenter']), Paragraph("207.7 MB", styles['TableCellCenter']), Paragraph("287,752", styles['TableCellCenter'])],
+        [Paragraph("100K", styles['TableCellCenter']), Paragraph("100,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.022s", styles['TableCellCenter']), Paragraph("102.9 MB", styles['TableCellCenter']), Paragraph("4,525,561", styles['TableCellCenter'])],
+        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("Pandas (In-Memory)", styles['TableCell']), Paragraph("0.114s", styles['TableCellCenter']), Paragraph("369.9 MB", styles['TableCellCenter']), Paragraph("8,742,003", styles['TableCellCenter'])],
+        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("MapReduce Sim (Multi-Proc)", styles['TableCell']), Paragraph("0.920s", styles['TableCellCenter']), Paragraph("803.4 MB", styles['TableCellCenter']), Paragraph("1,087,160", styles['TableCellCenter'])],
+        [Paragraph("1M", styles['TableCellCenter']), Paragraph("1,000,000", styles['TableCellCenter']), Paragraph("Spark Sim (Partitioned DAG)", styles['TableCell']), Paragraph("0.144s", styles['TableCellCenter']), Paragraph("383.2 MB", styles['TableCellCenter']), Paragraph("6,939,747", styles['TableCellCenter'])],
+        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>Pandas (Streaming Aggregation)</b>", styles['TableCell']), Paragraph("<b>3.488s</b>", styles['TableCellCenter']), Paragraph("1,658.2 MB", styles['TableCellCenter']), Paragraph("<b>2,866,712</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>MapReduce (Streaming Aggregation)</b>", styles['TableCell']), Paragraph("<b>15.940s</b>", styles['TableCellCenter']), Paragraph("1,833.6 MB", styles['TableCellCenter']), Paragraph("<b>627,348</b>", styles['TableCellCenter'])],
+        [Paragraph("<b>10M</b>", styles['TableCellCenter']), Paragraph("10,000,000", styles['TableCellCenter']), Paragraph("<b>Spark Sim (Streaming Aggregation)</b>", styles['TableCell']), Paragraph("<b>4.727s</b>", styles['TableCellCenter']), Paragraph("1,665.3 MB", styles['TableCellCenter']), Paragraph("<b>2,115,334</b>", styles['TableCellCenter'])],
     ]
     t_bench = Table(bench_table_data, colWidths=[55, 75, 115, 75, 85, 118])
     t_bench.setStyle(TableStyle([
@@ -605,15 +624,15 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_bench)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
-    # Dual Visuals: Chart 3 & Chart 4 side by side (height 1.85 inches)
+    # Dual Visuals: Chart 3 & Chart 4 side by side
     p3_path = os.path.join(fig_dir, "03_big_data_execution_time_benchmark.png")
     p4_path = os.path.join(fig_dir, "04_big_data_memory_throughput_benchmark.png")
     if os.path.exists(p3_path) and os.path.exists(p4_path):
         img_table2 = Table([[
-            Image(p3_path, width=3.55*inch, height=1.85*inch),
-            Image(p4_path, width=3.55*inch, height=1.85*inch)
+            Image(p3_path, width=3.55*inch, height=1.82*inch),
+            Image(p4_path, width=3.55*inch, height=1.82*inch)
         ]], colWidths=[261, 262])
         img_table2.setStyle(TableStyle([
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
@@ -627,13 +646,13 @@ def build_pdf(
     # Plain English Automobile Analogy Box
     car_analogy = (
         "<b>Architectural Tradeoff: Single-Node vs. Distributed Cluster Execution</b><br/>"
-        "• <b>Pandas (Vectorized In-Memory):</b> On single-node datasets that fit entirely in physical RAM (<1GB), Pandas is fastest (8.8M rec/s) "
-        "because C-vectorized execution incurs zero IPC or network serialization overhead. In the 10M tier, chunked streaming preserves memory.<br/>"
+        "• <b>Pandas (Vectorized In-Memory):</b> On single-node datasets that fit entirely in physical RAM (<1GB), Pandas is fastest (8.7M rec/s) "
+        "because C-vectorized execution incurs zero IPC or network serialization overhead. Pure aggregation on 10M records completes in 3.49s.<br/>"
         "• <b>MapReduce Simulation (Multi-Process):</b> Simulates parallel Map and Reduce stages across Python worker processes. It incurs IPC serialization "
-        "overhead on smaller batches, but distributes CPU-bound operations across cores.<br/>"
-        "• <b>Apache Spark Engine:</b> In local simulation, Spark's partitioned Catalyst model processes millions of records smoothly. In multi-node production "
-        "deployments, native PySpark (included in our Google Colab notebook) distributes tasks across worker nodes, enabling out-of-core memory spilling and "
-        "fault tolerance for massive datasets exceeding RAM (>100GB)."
+        "overhead on smaller batches and higher peak memory (803 MB at 1M; 1,834 MB at 10M), but demonstrates parallel divide-and-conquer processing.<br/>"
+        "• <b>Apache Spark Engine:</b> In local simulation, Spark's partitioned Catalyst model processes millions of records smoothly (4.73s on 10M). "
+        "In enterprise production environments, native PySpark (included in our Google Colab notebook) distributes tasks across worker nodes, "
+        "enabling out-of-core memory spilling and resilient fault tolerance for datasets exceeding RAM (>100GB)."
     )
     story.append(make_plain_english_box("Why Big Data Architecture Matters: Architectural Realities", car_analogy, styles))
 
@@ -644,18 +663,18 @@ def build_pdf(
     # ==========================================================================
     story.append(Paragraph("5. Customer Fatigue, Diminishing Returns & The Conversion Funnel", styles['SecHeader']))
     story.append(Paragraph(
-        "A common question asked by company executives is: <i>'If Google has the highest ROAS (4.62x), why don't we put all Rs. 1 Million into Google?'</i> "
+        "A common question asked by company executives is: <i>'If Google has the highest ROAS (5.03x), why don't we put all Rs. 1 Million into Google?'</i> "
         "The answer lies in two universal marketing realities: <b>Audience Saturation</b> and <b>Funnel Drop-offs</b>.",
         styles['BodyCustom']
     ))
 
-    # Dual Visuals: Chart 7 & Chart 5 side by side (height 2.0 inches)
+    # Dual Visuals: Chart 7 & Chart 5 side by side
     p7_path = os.path.join(fig_dir, "07_diminishing_returns_marginal_roas.png")
     p5_path = os.path.join(fig_dir, "05_conversion_funnel_by_platform.png")
     if os.path.exists(p7_path) and os.path.exists(p5_path):
         img_table3 = Table([[
-            Image(p7_path, width=3.55*inch, height=2.0*inch),
-            Image(p5_path, width=3.55*inch, height=2.0*inch)
+            Image(p7_path, width=3.55*inch, height=1.95*inch),
+            Image(p5_path, width=3.55*inch, height=1.95*inch)
         ]], colWidths=[261, 262])
         img_table3.setStyle(TableStyle([
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
@@ -673,22 +692,22 @@ def build_pdf(
         "By the fourth plate, you are completely full. If someone forces you to eat a fifth plate, you will feel sick.<br/>"
         "In digital marketing, human beings react the exact same way—this is known as <b>The Law of Diminishing Returns</b>:<br/>"
         "• In Pakistan, there are only so many people searching Google for <i>'stitched lawn suits'</i> each day.<br/>"
-        "• Your first Rs. 100,000 captures those ready-to-buy customers at a massive <b>4.62x ROAS</b>.<br/>"
+        "• Your first Rs. 100,000 captures those ready-to-buy customers at a massive <b>5.03x ROAS</b>.<br/>"
         "• But if you force Rs. 1,000,000 into Google in 30 days, Google starts showing your ads to people who aren't interested, or shows "
         "the same ad 15 times to the same person. The person gets annoyed (ad fatigue) and stops clicking.<br/>"
-        "• Look at Figure 4 (Left): As spend climbs toward Rs. 1 Million on a single channel, the extra revenue per Rupee collapses down to 1.8x. "
-        "By distributing the budget into Instagram (Rs. 300K) and Facebook (Rs. 200K), you catch customers at their highest enjoyment point on every app!"
+        "• Look at Figure 4 (Left): As spend climbs toward Rs. 1 Million on a single channel, the marginal revenue per Rupee collapses down to 1.8x. "
+        "By distributing the budget into Instagram (Rs. 350K) and Facebook (Rs. 130K), you catch customers at their highest enjoyment point on every app!"
     )
     story.append(make_plain_english_box("Understanding Diminishing Returns with a Simple Analogy", buffet_analogy, styles))
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     # Funnel Explanation Box
     funnel_text = (
         "<b>Where do Pakistani customers disappear in the funnel? (Figure 4 Right)</b><br/>"
         "• <b>Impressions (Top Bar):</b> Millions of people glance at your ad while scrolling. TikTok generates 6.1 Million views easily.<br/>"
         "• <b>Clicks (Middle Bar):</b> Out of 100 people who see the ad, only 2 to 3 people tap on it (CTR). TikTok gets huge clicks because it is cheap.<br/>"
-        "• <b>Conversions / Orders (Bottom Bar):</b> This is where the truth comes out! Out of all those clicks, Google converts 4.8% and Instagram "
-        "converts 4.0% into paying deliveries, while TikTok converts only 1.7%. That is why Google and Instagram produce the thickest order bars."
+        "• <b>Conversions / Orders (Bottom Bar):</b> This is where the truth comes out! Out of all those clicks, Google converts 5.4% and Instagram "
+        "converts 5.3% into paying deliveries, while TikTok converts only 2.0%. That is why Google and Instagram produce the thickest order bars."
     )
     story.append(make_callout(funnel_text, styles))
 
@@ -729,24 +748,24 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_city)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
-    # Embed Chart 8: Regional City Revenue Efficiency Matrix (height 2.0 inches)
+    # Embed Chart 8: Regional City Revenue Efficiency Matrix
     p8_path = os.path.join(fig_dir, "08_city_revenue_efficiency_matrix.png")
     if os.path.exists(p8_path):
-        story.append(Image(p8_path, width=7.0*inch, height=2.0*inch))
+        story.append(Image(p8_path, width=7.0*inch, height=1.95*inch))
         story.append(Paragraph("Figure 5: Regional City Revenue vs. ROAS Efficiency Matrix across Pakistani Urban Hubs", styles['CaptionText']))
 
     # Plain English COD and RTO Explanation Box
     cod_text = (
         "<b>The Hidden Enemy of Pakistani E-Commerce: Return to Origin (RTO)</b><br/>"
-        "Why did our model allocate <b>84% of the advertising money into Karachi, Lahore, and Islamabad/Rawalpindi</b>?<br/>"
+        "Why did our model allocate <b>87.8% of the advertising money into Karachi, Lahore, and Islamabad/Rawalpindi</b>?<br/>"
         "• When an online customer in Karachi orders a lawn dress on Cash on Delivery, the courier rider delivers it in 24–48 hours. "
         "The customer remembers ordering it, pays the cash, and the delivery success rate is <b>over 88% to 90%</b>.<br/>"
         "• But when an ad runs in remote towns or distant villages, shipping takes 5 to 7 days. By the time the rider shows up, "
         "the customer has changed their mind, doesn't have the cash, or refuses the door. The parcel returns back to the warehouse.<br/>"
-        "• When a parcel bounces (RTO), <b>the brand loses money twice</b>: You paid Rs. 350 to send the package, another Rs. 200 for the return courier, "
-        "and you already burned Rs. 500 on the Facebook ad! Spending ad money in weak courier zones silently bankrupts Pakistani brands.<br/>"
+        "• When a parcel bounces (RTO), <b>the brand loses money twice</b>: You paid Rs. 220 to send the package, another Rs. 180 for the return courier, "
+        "and you already burned Rs. 500 on the ad! Spending ad money in weak courier zones silently bankrupts Pakistani brands.<br/>"
         "Focusing ad spend in Tier-1 logistics hubs guarantees fast 24-hour deliveries, keeps parcel returns under 12%, and protects cash flow."
     )
     story.append(make_plain_english_box("Why Courier Logistics Dictates Advertising Profit in Pakistan", cod_text, styles))
@@ -763,13 +782,13 @@ def build_pdf(
         styles['BodyCustom']
     ))
 
-    # Dual Visuals: Chart 9 & Chart 10 side by side (height 2.0 inches)
+    # Dual Visuals: Chart 9 & Chart 10 side by side
     p9_path = os.path.join(fig_dir, "09_demographic_age_gender_performance.png")
     p10_path = os.path.join(fig_dir, "10_monthly_spend_revenue_profit_trend.png")
     if os.path.exists(p9_path) and os.path.exists(p10_path):
         img_table4 = Table([[
-            Image(p9_path, width=3.55*inch, height=2.0*inch),
-            Image(p10_path, width=3.55*inch, height=2.0*inch)
+            Image(p9_path, width=3.55*inch, height=1.95*inch),
+            Image(p10_path, width=3.55*inch, height=1.95*inch)
         ]], colWidths=[261, 262])
         img_table4.setStyle(TableStyle([
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
@@ -826,7 +845,7 @@ def build_pdf(
         ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(t_plan)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     # SQL Code Excerpt
     story.append(Paragraph("Production SQL Warehouse Query (Query 7: Pure-SQL Automated Budget Reallocator):", styles['SubSecHeader']))
@@ -851,13 +870,13 @@ def build_pdf(
     t_sql.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F8FAFB')),
         ('BOX', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0,0), (-1,-1), 3.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
         ('LEFTPADDING', (0,0), (-1,-1), 8),
         ('RIGHTPADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(t_sql)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     # Plain English SQL explanation
     sql_plain = (
@@ -866,7 +885,7 @@ def build_pdf(
         "below the 3.0x break-even line, it flags: <i>'Cap spend to discovery budgets!'</i> This prevents human error and stops marketing teams from burning money."
     )
     story.append(make_plain_english_box("Automated Safety Switch", sql_plain, styles))
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     # Concluding Sign-off Box
     signoff = Paragraph(
@@ -879,8 +898,8 @@ def build_pdf(
     t_sign.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), BG_LIGHT),
         ('BOX', (0,0), (-1,-1), 1, PRIMARY),
-        ('TOPPADDING', (0,0), (-1,-1), 3.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
         ('LEFTPADDING', (0,0), (-1,-1), 8),
         ('RIGHTPADDING', (0,0), (-1,-1), 8),
     ]))

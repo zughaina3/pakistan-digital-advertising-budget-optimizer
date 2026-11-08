@@ -278,72 +278,69 @@ except Exception as e:
 ## 🎯 6. Mathematical Budget Optimization: Allocating the Next Rs. 1 Million
 Management asks: **"Where should we spend the next Rs. 1 Million (PKR 1,000,000)?"**
 
-Rather than guessing or applying static weights, we calibrate an empirical diminishing marginal returns response curve for each platform $i$:
+Rather than relying on heuristics or uncalibrated saturation constants, we fit empirical diminishing marginal return curves directly to daily spend and revenue observations using `scipy.optimize.curve_fit`:
 $$R_i(x_i) = \\alpha_i \\cdot \\ln\\left(1 + \\beta_i \\cdot x_i\\right)$$
-where $\\beta_i = \\frac{\\text{ROAS}_{0, i}}{\\alpha_i}$.
 
-We solve the non-linear portfolio optimization problem using **Sequential Least Squares Programming (SLSQP)** via `scipy.optimize.minimize`:
+We then solve the non-linear portfolio optimization problem using **Sequential Least Squares Programming (SLSQP)** via `scipy.optimize.minimize`:
 $$\\max_{\\mathbf{x}} \\sum_{i=1}^5 R_i(x_i) \\quad \\text{subject to} \\quad \\sum_{i=1}^5 x_i = B, \\quad L_i \\le x_i \\le U_i$$
 """))
     cells.append(create_code_cell("""
-# Empirical parameter calibration directly from campaign data
-alpha_dict = {
-    'Google': 3500000.0,
-    'Instagram': 3000000.0,
-    'Facebook': 2200000.0,
-    'TikTok': 1500000.0,
-    'YouTube': 1000000.0
-}
+from scipy.optimize import curve_fit, minimize
+
+def log_curve(x, alpha, beta):
+    return alpha * np.log1p(beta * x)
 
 platforms = ['Google', 'Instagram', 'Facebook', 'TikTok', 'YouTube']
-base_roas = dict(zip(platform_perf['platform'], platform_perf['roas']))
-base_cpa = dict(zip(platform_perf['platform'], platform_perf['cpa']))
+curve_params = {}
 
-betas = {p: base_roas.get(p, 3.0) / alpha_dict[p] for p in platforms}
+for p in platforms:
+    sub = df[df['platform'] == p]
+    daily = sub.groupby('date').agg({'spend': 'sum', 'revenue': 'sum'}).reset_index()
+    x_pts = daily['spend'].values
+    y_pts = daily['revenue'].values
+    popt, _ = curve_fit(log_curve, x_pts, y_pts, p0=[y_pts.max() * 5.0, 1e-5], bounds=([0, 0], [np.inf, np.inf]), maxfev=10000)
+    curve_params[p] = {'alpha': popt[0], 'beta': popt[1]}
+    print(f"{p:<12}: Fitted alpha = {popt[0]:>12,.0f}, beta = {popt[1]:.2e}")
 
 TOTAL_BUDGET = 1000000.0
 
-# Define objective: minimize negative revenue (maximize revenue)
 def neg_total_revenue(x):
-    rev = sum(alpha_dict[p] * np.log(1.0 + betas[p] * x[i]) for i, p in enumerate(platforms))
-    return -rev
+    return -sum(log_curve(x[i], curve_params[p]['alpha'], curve_params[p]['beta']) for i, p in enumerate(platforms))
 
-# Budget constraint: sum(x) = TOTAL_BUDGET
 budget_constraint = {'type': 'eq', 'fun': lambda x: np.sum(x) - TOTAL_BUDGET}
 
-# Strategy 2: Balanced Portfolio Growth (Recommended)
-# Diversification constraints: Google & IG 15-40%, FB 8-25%, TT 5-15%, YT 2-10%
+# Strategy: Balanced Strategic Growth (Recommended)
+# Diversification constraints: Google 15-40%, IG 15-35%, FB 10-25%, TikTok 8-20%, YouTube 4-15%
 bounds_balanced = [
-    (150000, 400000),  # Google
-    (150000, 350000),  # Instagram
-    (80000, 250000),   # Facebook
-    (50000, 150000),   # TikTok
-    (20000, 100000)    # YouTube
+    (0.15 * TOTAL_BUDGET, 0.40 * TOTAL_BUDGET),  # Google
+    (0.15 * TOTAL_BUDGET, 0.35 * TOTAL_BUDGET),  # Instagram
+    (0.10 * TOTAL_BUDGET, 0.25 * TOTAL_BUDGET),  # Facebook
+    (0.08 * TOTAL_BUDGET, 0.20 * TOTAL_BUDGET),  # TikTok
+    (0.04 * TOTAL_BUDGET, 0.15 * TOTAL_BUDGET),  # YouTube
 ]
 
 x0 = [TOTAL_BUDGET / len(platforms)] * len(platforms)
-
 res_opt = minimize(neg_total_revenue, x0, method='SLSQP', bounds=bounds_balanced, constraints=[budget_constraint])
 assert res_opt.success, "Optimization failed!"
 
 opt_spend = res_opt.x
+aov_map = dict(zip(platform_perf['platform'], platform_perf['aov']))
 rec_rows = []
 tot_rev = 0
 tot_orders = 0
 
 for i, p in enumerate(platforms):
     sp = round(opt_spend[i], 2)
-    rev = round(alpha_dict[p] * np.log(1.0 + betas[p] * sp), 2)
-    cpa_val = base_cpa.get(p, 500)
-    orders = int(sp / cpa_val) if cpa_val > 0 else 0
+    rev = round(log_curve(sp, curve_params[p]['alpha'], curve_params[p]['beta']), 2)
+    orders = max(1, int(round(rev / aov_map.get(p, 2000))))
+    cpa_val = round(sp / orders, 2)
     roas_val = round(rev / sp, 2) if sp > 0 else 0.0
     
-    # Net operating profit
+    # Net operating profit accounting (45% COGS, Rs. 220 courier, 12% COD returns, Rs. 180 return fee)
     del_rev = rev * (1.0 - COD_RETURN_RATE)
     cogs_v = del_rev * COGS_PCT
-    ship_v = orders * SHIPPING_PKR
-    ret_v = (orders * COD_RETURN_RATE) * RETURN_SHIPPING_PKR
-    net_p = round(del_rev - cogs_v - ship_v - ret_v - sp, 2)
+    ship_v = orders * (SHIPPING_PKR + COD_RETURN_RATE * RETURN_SHIPPING_PKR)
+    net_p = round(del_rev - cogs_v - ship_v - sp, 2)
     
     rec_rows.append({
         'Platform': p,
