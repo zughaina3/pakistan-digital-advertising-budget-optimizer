@@ -125,7 +125,11 @@ def plot_02_roas_benchmark(df_platform, output_path):
     ax.text(len(data) - 0.45, blended_roas + 0.12, f'Blended Average: {blended_roas:.2f}x', ha='right', fontsize=9, color=PRIMARY, style='italic')
     
     ax.set_ylabel('Return on Ad Spend (ROAS = Revenue / Spend)', fontsize=11, color=TEXT_MUTED)
-    ax.set_title(f"Google (4.62x) and Instagram (4.32x) exceed the 3.0x break-even target; TikTok and YouTube underperform",
+    top_p1 = data.iloc[0]['platform']
+    top_p1_r = data.iloc[0]['roas']
+    top_p2 = data.iloc[1]['platform']
+    top_p2_r = data.iloc[1]['roas']
+    ax.set_title(f"{top_p1} ({top_p1_r:.2f}x) and {top_p2} ({top_p2_r:.2f}x) exceed the 3.0x break-even target; TikTok and YouTube underperform",
                  loc='left', fontsize=12, color=TEXT, pad=12)
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: f'{x:.1f}x'))
     ax.set_ylim(0, max(data['roas']) * 1.25)
@@ -146,15 +150,20 @@ def plot_03_benchmark_scalability(df_bench, output_path):
     fig, ax = plt.subplots(figsize=(10, 5.5))
     
     engine_styles = {
-        'Pandas': {'color': ACCENT_RUST, 'marker': 'o', 'ls': '-'},
-        'MapReduce': {'color': ACCENT_GOLD, 'marker': 's', 'ls': '--'},
-        'Apache Spark': {'color': PRIMARY, 'marker': '^', 'ls': '-'}
+        'Pandas (In-Memory)': {'color': ACCENT_RUST, 'marker': 'o', 'ls': '-', 'label': 'Pandas (Vectorized In-Memory)'},
+        'MapReduce (Multi-Proc)': {'color': ACCENT_GOLD, 'marker': 's', 'ls': '--', 'label': 'MapReduce Sim (Multi-Process)'},
+        'Spark (Partitioned DAG)': {'color': PRIMARY, 'marker': '^', 'ls': '-', 'label': 'Spark Sim (Partitioned DAG)'}
     }
     
-    for engine, style in engine_styles.items():
-        sub = df_bench[df_bench['engine'] == engine].sort_values('records')
+    for engine_key, style in engine_styles.items():
+        sub = df_bench[df_bench['engine'] == engine_key].sort_values('records')
+        if len(sub) == 0:
+            # Fallback prefix matching
+            prefix = engine_key.split()[0]
+            sub = df_bench[df_bench['engine'].str.startswith(prefix)].sort_values('records')
+            
         if len(sub) > 0:
-            ax.plot(sub['records'], sub['elapsed_sec'], label=engine,
+            ax.plot(sub['records'], sub['elapsed_sec'], label=style['label'],
                     color=style['color'], marker=style['marker'], linestyle=style['ls'],
                     linewidth=2.4, markersize=8)
             
@@ -189,9 +198,13 @@ def plot_04_memory_throughput(df_bench, output_path):
         tier_1m = df_bench[df_bench['records'] == 1000000].copy()
         
     palette = [ACCENT_RUST, ACCENT_GOLD, PRIMARY]
+    short_names = [
+        'Pandas' if 'Pandas' in e else 'MapReduce' if 'MapReduce' in e else 'Spark Sim'
+        for e in tier_1m['engine']
+    ]
     
     # Left: Peak Memory Footprint
-    bars1 = ax1.bar(tier_1m['engine'], tier_1m['peak_mem_mb'], color=palette, width=0.5)
+    bars1 = ax1.bar(short_names, tier_1m['peak_mem_mb'], color=palette, width=0.5)
     for bar in bars1:
         ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5,
                  f"{bar.get_height():.1f} MB", ha='center', fontsize=10, fontweight='bold', color=TEXT)
@@ -201,7 +214,7 @@ def plot_04_memory_throughput(df_bench, output_path):
     ax1.spines[['top', 'right']].set_visible(False)
     
     # Right: Processing Throughput (Records/Sec)
-    bars2 = ax2.bar(tier_1m['engine'], tier_1m['throughput_rps'] / 1e6, color=palette, width=0.5)
+    bars2 = ax2.bar(short_names, tier_1m['throughput_rps'] / 1e6, color=palette, width=0.5)
     for bar in bars2:
         ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.25,
                  f"{bar.get_height():.2f}M rec/s", ha='center', fontsize=10, fontweight='bold', color=TEXT)
@@ -284,7 +297,8 @@ def plot_06_budget_allocation(brief_path, output_path):
                  f"Rs. {rev/1e3:,.0f}K\n({roas:.2f}x)", ha='center', fontsize=9.5, fontweight='bold', color=TEXT)
                  
     ax2.set_ylabel("Expected Revenue (PKR Thousands)", fontsize=11, color=TEXT_MUTED)
-    ax2.set_title("Projected Revenue Contribution by Channel (Rs. 3.09M Total)", loc='left', fontsize=12, color=TEXT, pad=10)
+    tot_rev_k = df_rec['revenue'].sum() / 1e3
+    ax2.set_title(f"Projected Revenue Contribution by Channel (Rs. {tot_rev_k/1e3:.2f}M Total)", loc='left', fontsize=12, color=TEXT, pad=10)
     ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: f'Rs. {x:,.0f}K'))
     ax2.set_ylim(0, max(df_rec['revenue'] / 1e3) * 1.25)
     ax2.spines[['top', 'right']].set_visible(False)
@@ -300,23 +314,27 @@ def plot_06_budget_allocation(brief_path, output_path):
 # ==============================================================================
 # CHART 7: DIMINISHING RETURNS SATURATION CURVES
 # ==============================================================================
-def plot_07_diminishing_returns(output_path):
+def plot_07_diminishing_returns(output_path, df_platform=None):
     fig, ax = plt.subplots(figsize=(10, 5.5))
     spend_range = np.linspace(10000, 600000, 200)
     
-    # Response models
+    # Load calibrated base parameters from platform summary if available
+    roas_map = {}
+    if df_platform is not None:
+        roas_map = dict(zip(df_platform['platform'], df_platform['roas']))
+        
     platforms_cfg = {
-        'Google': {'alpha': 2500000, 'roas_0': 4.62, 'color': PRIMARY},
-        'Instagram': {'alpha': 2200000, 'roas_0': 4.32, 'color': SECONDARY},
-        'Facebook': {'alpha': 1800000, 'roas_0': 3.01, 'color': ACCENT_DARK},
-        'TikTok': {'alpha': 1200000, 'roas_0': 2.40, 'color': ACCENT_GOLD},
-        'YouTube': {'alpha': 900000, 'roas_0': 1.81, 'color': ACCENT_RUST}
+        'Google': {'alpha': 3500000, 'roas_0': roas_map.get('Google', 5.03), 'color': PRIMARY},
+        'Instagram': {'alpha': 3000000, 'roas_0': roas_map.get('Instagram', 4.62), 'color': SECONDARY},
+        'Facebook': {'alpha': 2200000, 'roas_0': roas_map.get('Facebook', 3.57), 'color': ACCENT_DARK},
+        'TikTok': {'alpha': 1500000, 'roas_0': roas_map.get('TikTok', 2.30), 'color': ACCENT_GOLD},
+        'YouTube': {'alpha': 1000000, 'roas_0': roas_map.get('YouTube', 1.92), 'color': ACCENT_RUST}
     }
     
     for p, cfg in platforms_cfg.items():
         beta = cfg['roas_0'] / cfg['alpha']
         expected_rev = cfg['alpha'] * np.log(1 + beta * spend_range)
-        ax.plot(spend_range / 1e3, expected_rev / 1e3, label=f"{p} (Base: {cfg['roas_0']:.1f}x)",
+        ax.plot(spend_range / 1e3, expected_rev / 1e3, label=f"{p} (Empirical: {cfg['roas_0']:.2f}x)",
                 color=cfg['color'], linewidth=2.4)
         
     # Break-even line (ROAS = 3.0x)
@@ -354,7 +372,9 @@ def plot_08_city_performance(df_city, output_path):
                 f"Rs. {rev/1e6:,.1f}M ({roas:.2f}x)", va='center', fontsize=9.5, fontweight='bold', color=TEXT)
                 
     ax.set_xlabel('Attributed Revenue (PKR Millions)', fontsize=11, color=TEXT_MUTED)
-    ax.set_title('Regional E-Commerce Hubs: Karachi, Lahore, and Islamabad generate 77% of total revenue in Pakistan',
+    top3_rev = data[data['city'].isin(['Karachi', 'Lahore', 'Islamabad'])]['revenue'].sum()
+    top3_share = (top3_rev / data['revenue'].sum()) * 100 if data['revenue'].sum() > 0 else 77.0
+    ax.set_title(f'Regional E-Commerce Hubs: Karachi, Lahore, and Islamabad generate {top3_share:.0f}% of total revenue in Pakistan',
                  loc='left', fontsize=12, color=TEXT, pad=12)
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: f'Rs. {x:.0f}M'))
     ax.set_xlim(0, max(data['revenue'] / 1e6) * 1.25)
@@ -408,14 +428,18 @@ def plot_10_monthly_trend(df_monthly, output_path):
             marker='o', markersize=6, label='Advertising Spend')
     ax.plot(data['month'], data['revenue'] / 1e6, color=PRIMARY, linewidth=2.5,
             marker='s', markersize=6, label='Attributed Revenue')
-    ax.plot(data['month'], data['net_profit'] / 1e6, color=ACCENT_GOLD, linewidth=2.0,
-            marker='^', linestyle='--', markersize=6, label='Net Margin Contribution')
+    profit_col = 'true_net_profit' if 'true_net_profit' in data.columns else 'gross_margin'
+    profit_label = 'Operating Net Profit' if profit_col == 'true_net_profit' else 'Gross Margin'
+    ax.plot(data['month'], data[profit_col] / 1e6, color=ACCENT_GOLD, linewidth=2.0,
+            marker='^', linestyle='--', markersize=6, label=profit_label)
             
     ax.fill_between(data['month'], data['spend'] / 1e6, data['revenue'] / 1e6,
-                    color=PRIMARY, alpha=0.08, label='Net Marketing Profit Zone')
+                    color=PRIMARY, alpha=0.08, label='Gross Revenue Above Spend')
                     
     ax.set_ylabel('Amount (PKR Millions)', fontsize=11, color=TEXT_MUTED)
-    ax.set_title('Annual Performance Trend: Revenue scaled 180% during Eid & Summer Pret launches while sustaining margin',
+    peak_m = data.loc[data['revenue'].idxmax()]['month']
+    peak_rev = data['revenue'].max() / 1e6
+    ax.set_title(f'Annual Trend: Revenue peaked in {peak_m} (Rs. {peak_rev:.1f}M) while sustaining positive net operating profit',
                  loc='left', fontsize=12, color=TEXT, pad=12)
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: f'Rs. {x:,.0f}M'))
     ax.legend(frameon=True, facecolor=BG, edgecolor='#D4D1CA', loc='upper left', fontsize=9.5)
@@ -452,7 +476,7 @@ def generate_all_figures(output_dir='reports/figures'):
     plot_04_memory_throughput(df_bench, os.path.join(output_dir, '04_big_data_memory_throughput_benchmark.png'))
     plot_05_conversion_funnel(df_platform, os.path.join(output_dir, '05_conversion_funnel_by_platform.png'))
     plot_06_budget_allocation(brief_path, os.path.join(output_dir, '06_recommended_budget_allocation_rs1m.png'))
-    plot_07_diminishing_returns(os.path.join(output_dir, '07_diminishing_returns_marginal_roas.png'))
+    plot_07_diminishing_returns(os.path.join(output_dir, '07_diminishing_returns_marginal_roas.png'), df_platform)
     plot_08_city_performance(df_city, os.path.join(output_dir, '08_city_revenue_efficiency_matrix.png'))
     plot_09_demographics(df_demo, os.path.join(output_dir, '09_demographic_age_gender_performance.png'))
     plot_10_monthly_trend(df_monthly, os.path.join(output_dir, '10_monthly_spend_revenue_profit_trend.png'))

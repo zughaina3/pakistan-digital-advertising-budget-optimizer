@@ -11,6 +11,7 @@ D2C e-commerce brands (apparel, pret, tote bags, accessories) across:
 """
 
 import os
+import gc
 import argparse
 import numpy as np
 import pandas as pd
@@ -86,8 +87,14 @@ PLATFORM_PROFILES = {
 }
 
 
-def generate_batch(num_records: int, start_date: str = '2025-06-01', days: int = 365) -> pd.DataFrame:
-    """Generate a realistic batch of marketing campaign logs."""
+def generate_batch(num_records: int, start_date: str = '2025-06-01', days: int = 365, seed: int = None) -> pd.DataFrame:
+    """
+    Generate a realistic batch of marketing campaign logs with non-linear diminishing returns,
+    demographic interactions, and realistic variance.
+    """
+    if seed is not None:
+        np.random.seed(seed)
+        
     start_dt = datetime.strptime(start_date, '%Y-%m-%d')
     date_offsets = np.random.randint(0, days, size=num_records)
     dates = [start_dt + timedelta(days=int(d)) for d in date_offsets]
@@ -103,7 +110,7 @@ def generate_batch(num_records: int, start_date: str = '2025-06-01', days: int =
     devices = np.random.choice(DEVICES, size=num_records, p=DEVICE_WEIGHTS)
     
     # Daily budget spends per ad set (in PKR)
-    # Range: Rs. 1,000 to Rs. 25,000 per daily ad campaign placement
+    # Range: Rs. 800 to Rs. 28,000 per daily ad campaign placement
     base_spends = np.random.exponential(scale=3500, size=num_records) + 800
     spends = np.clip(base_spends, 800, 30000).round(2)
     
@@ -120,35 +127,111 @@ def generate_batch(num_records: int, start_date: str = '2025-06-01', days: int =
         
         cfg = PLATFORM_PROFILES[platform]
         p_spends = spends[mask]
+        p_campaigns = campaigns[mask]
+        p_cities = cities[mask]
+        p_ages = ages[mask]
+        p_genders = genders[mask]
+        p_devices = devices[mask]
         
-        # 1. Clicks = Spend / CPC
-        cpc_variations = cfg['cpc'] * np.random.uniform(0.88, 1.12, size=n)
-        p_clicks = np.maximum(1, (p_spends / cpc_variations).astype(int))
+        # ----------------------------------------------------------------------
+        # 1. Non-Linear Ad Saturation & Diminishing Marginal Returns
+        # As daily spend in an ad placement increases, auction competition rises
+        # (marginal CPC increases) and audience ad fatigue sets in (marginal CVR falls).
+        # ----------------------------------------------------------------------
+        spend_ratio = p_spends / 4000.0
+        cpc_saturation_factor = 1.0 + 0.15 * np.log1p(spend_ratio)
+        cvr_saturation_factor = 1.0 / (1.0 + 0.12 * np.log1p(spend_ratio))
         
-        # 2. Impressions = Clicks / CTR
-        ctr_variations = cfg['ctr'] * np.random.uniform(0.85, 1.15, size=n)
+        # Base CPC with auction noise
+        effective_cpc = cfg['cpc'] * cpc_saturation_factor * np.random.uniform(0.90, 1.10, size=n)
+        p_clicks = np.maximum(1, (p_spends / effective_cpc).astype(int))
+        
+        # Impressions = Clicks / CTR (with CTR variation)
+        ctr_variations = cfg['ctr'] * np.random.uniform(0.88, 1.12, size=n)
         p_impressions = np.maximum(p_clicks, (p_clicks / ctr_variations).astype(int))
         
-        # 3. Conversions = Clicks * CVR
-        cvr_variations = cfg['cvr'] * np.random.uniform(0.80, 1.20, size=n)
+        # ----------------------------------------------------------------------
+        # 2. Demographic x Platform Interactions
+        # ----------------------------------------------------------------------
+        demog_cvr_mult = np.ones(n, dtype=float)
+        demog_aov_mult = np.ones(n, dtype=float)
         
-        # Campaign modifier: Retargeting has 1.6x higher CVR; Clearance has 1.3x higher CVR
-        camp_slice = campaigns[mask]
-        camp_mult = np.where(camp_slice == 'Retargeting_Abandoned_Cart', 1.60, 
-                    np.where(camp_slice == 'Flash_Clearance_Sale', 1.30, 1.0))
+        # Gender interaction
+        if platform in ['Instagram', 'Facebook']:
+            # Women drive fashion/pret conversions
+            demog_cvr_mult = np.where(p_genders == 'Female', demog_cvr_mult * 1.25, demog_cvr_mult * 0.85)
+        elif platform == 'Google':
+            # Men have higher AOV on search (buying higher-ticket gifts, tech accessories)
+            demog_aov_mult = np.where(p_genders == 'Male', demog_aov_mult * 1.15, demog_aov_mult * 1.0)
+            
+        # Age group interaction
+        if platform in ['TikTok', 'Instagram']:
+            # Gen Z (18-24) converts heavily on tote bags / student apparel, but lower AOV
+            is_genz = (p_ages == '18-24')
+            demog_cvr_mult = np.where(is_genz, demog_cvr_mult * 1.28, demog_cvr_mult)
+            demog_aov_mult = np.where(is_genz, demog_aov_mult * 0.82, demog_aov_mult)
+        elif platform in ['Facebook', 'Google']:
+            # Older buyers (35-54) have higher disposable income for luxury / unstitched pret
+            is_mature = np.isin(p_ages, ['35-44', '45-54'])
+            demog_cvr_mult = np.where(is_mature, demog_cvr_mult * 1.12, demog_cvr_mult)
+            demog_aov_mult = np.where(is_mature, demog_aov_mult * 1.25, demog_aov_mult)
+            
+        # Device interaction (Desktop users have higher purchasing intent and larger carts)
+        demog_cvr_mult = np.where(p_devices == 'Desktop', demog_cvr_mult * 1.10, demog_cvr_mult)
+        demog_aov_mult = np.where(p_devices == 'Desktop', demog_aov_mult * 1.18, demog_aov_mult)
         
-        p_conversions = np.maximum(0, (p_clicks * cvr_variations * camp_mult).astype(int))
+        # ----------------------------------------------------------------------
+        # 3. Campaign x Platform Interactions
+        # ----------------------------------------------------------------------
+        camp_cvr_mult = np.ones(n, dtype=float)
+        camp_aov_mult = np.ones(n, dtype=float)
         
-        # 4. Revenue = Conversions * AOV
-        aov_variations = cfg['aov'] * np.random.uniform(0.85, 1.15, size=n)
+        # Retargeting has high intent across all channels
+        camp_cvr_mult = np.where(p_campaigns == 'Retargeting_Abandoned_Cart', camp_cvr_mult * 1.75, camp_cvr_mult)
+        # Festive Eid collection commands premium pricing
+        camp_aov_mult = np.where(p_campaigns == 'Eid_Festive_Collection', camp_aov_mult * 1.35, camp_aov_mult)
+        # Tote bags have high student volume, lower AOV
+        camp_cvr_mult = np.where(p_campaigns == 'ToteBag_Uni_Special', camp_cvr_mult * 1.20, camp_cvr_mult)
+        camp_aov_mult = np.where(p_campaigns == 'ToteBag_Uni_Special', camp_aov_mult * 0.72, camp_aov_mult)
+        # Clearance flash sale: high conversions, discounted price
+        camp_cvr_mult = np.where(p_campaigns == 'Flash_Clearance_Sale', camp_cvr_mult * 1.35, camp_cvr_mult)
+        camp_aov_mult = np.where(p_campaigns == 'Flash_Clearance_Sale', camp_aov_mult * 0.75, camp_aov_mult)
+
+        # ----------------------------------------------------------------------
+        # 4. Geographic Purchasing Power & Logistics Friction
+        # ----------------------------------------------------------------------
+        city_cvr_mult = np.ones(n, dtype=float)
+        city_aov_mult = np.ones(n, dtype=float)
         
-        # City modifier: Karachi and Islamabad have slightly higher purchasing power (+8%)
-        city_slice = cities[mask]
-        city_mult = np.where(np.isin(city_slice, ['Karachi', 'Islamabad', 'Lahore']), 1.08, 0.94)
+        # Tier 1 hubs: Karachi, Lahore (high volume, smooth logistics)
+        city_cvr_mult = np.where(np.isin(p_cities, ['Karachi', 'Lahore']), 1.08, city_cvr_mult)
+        city_aov_mult = np.where(np.isin(p_cities, ['Karachi', 'Lahore']), 1.05, city_aov_mult)
+        # Islamabad / Rawalpindi (highest per-capita purchasing power)
+        city_aov_mult = np.where(np.isin(p_cities, ['Islamabad', 'Rawalpindi']), 1.18, city_aov_mult)
+        city_cvr_mult = np.where(np.isin(p_cities, ['Islamabad', 'Rawalpindi']), 1.05, city_cvr_mult)
+        # Tier 2/3 remote cities: higher delivery bounce & conservative checkout
+        city_cvr_mult = np.where(np.isin(p_cities, ['Peshawar', 'Quetta', 'Gujranwala']), 0.88, city_cvr_mult)
+        city_aov_mult = np.where(np.isin(p_cities, ['Peshawar', 'Quetta', 'Gujranwala']), 0.92, city_aov_mult)
+
+        # ----------------------------------------------------------------------
+        # 5. Conversion Generation via Poisson Process
+        # Prevents integer truncation bias (which previously made high-spend rows have higher ROAS)
+        # ----------------------------------------------------------------------
+        cvr_combined = (cfg['cvr'] * cvr_saturation_factor * demog_cvr_mult * camp_cvr_mult * city_cvr_mult)
+        cvr_combined = np.clip(cvr_combined * np.random.uniform(0.85, 1.15, size=n), 0.002, 0.25)
+        
+        expected_conversions = p_clicks * cvr_combined
+        p_conversions = np.random.poisson(lam=expected_conversions)
+        
+        # ----------------------------------------------------------------------
+        # 6. Revenue Calculation
+        # ----------------------------------------------------------------------
+        aov_combined = (cfg['aov'] * demog_aov_mult * camp_aov_mult * city_aov_mult)
+        aov_combined = aov_combined * np.random.uniform(0.88, 1.12, size=n)
         
         p_revenues = np.where(
             p_conversions > 0,
-            (p_conversions * aov_variations * city_mult).round(2),
+            (p_conversions * aov_combined).round(2),
             0.0
         )
         
@@ -179,7 +262,22 @@ def generate_batch(num_records: int, start_date: str = '2025-06-01', days: int =
     return df
 
 
-def generate_all_datasets(output_dir: str = 'data/raw'):
+def generate_streaming_chunks(total_records: int, chunk_size: int = 1000000, start_seed: int = 100):
+    """Generator yielding distinct chunks of records without exhausting RAM."""
+    remaining = total_records
+    chunk_idx = 0
+    while remaining > 0:
+        current_chunk_size = min(remaining, chunk_size)
+        seed = start_seed + chunk_idx
+        chunk_df = generate_batch(current_chunk_size, seed=seed)
+        yield chunk_df
+        remaining -= current_chunk_size
+        chunk_idx += 1
+        del chunk_df
+        gc.collect()
+
+
+def generate_all_datasets(output_dir: str = 'data/raw', include_10m: bool = False):
     """Generate datasets for 10K, 100K, and 1M records."""
     os.makedirs(output_dir, exist_ok=True)
     
@@ -193,11 +291,23 @@ def generate_all_datasets(output_dir: str = 'data/raw'):
     for label, count in tiers.items():
         filepath = os.path.join(output_dir, f'campaign_data_{label}.csv')
         print(f"Generating Tier {label.upper()} ({count:,} records)...")
-        df = generate_batch(count)
+        df = generate_batch(count, seed=42)
         df.to_csv(filepath, index=False)
         size_mb = os.path.getsize(filepath) / (1024 * 1024)
         print(f"  ✓ Saved to {filepath} ({size_mb:.2f} MB)")
         generated_files[label] = filepath
+        
+    if include_10m:
+        print("Generating Tier 10M (10,000,000 records via streaming chunks)...")
+        filepath_10m = os.path.join(output_dir, 'campaign_data_10m.csv')
+        first = True
+        for chunk in generate_streaming_chunks(10000000, chunk_size=1000000):
+            chunk.to_csv(filepath_10m, mode='w' if first else 'a', header=first, index=False)
+            first = False
+            print("  ✓ Appended 1,000,000 records...")
+        size_mb = os.path.getsize(filepath_10m) / (1024 * 1024)
+        print(f"  ✓ Saved 10M records to {filepath_10m} ({size_mb:.2f} MB)")
+        generated_files['10m'] = filepath_10m
     
     print("\nDataset generation complete!")
     return generated_files
@@ -205,17 +315,20 @@ def generate_all_datasets(output_dir: str = 'data/raw'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate synthetic big data for Pakistan Ad Budget Optimizer.")
-    parser.add_argument('--tier', type=str, choices=['10k', '100k', '1m', 'all'], default='all',
-                        help="Select tier to generate (10k, 100k, 1m, or all)")
+    parser.add_argument('--tier', type=str, choices=['10k', '100k', '1m', '10m', 'all'], default='all',
+                        help="Select tier to generate (10k, 100k, 1m, 10m, or all)")
     args = parser.parse_args()
     
     if args.tier == 'all':
         generate_all_datasets()
+    elif args.tier == '10m':
+        generate_all_datasets(include_10m=True)
     else:
         counts = {'10k': 10000, '100k': 100000, '1m': 1000000}
         os.makedirs('data/raw', exist_ok=True)
         target = f'data/raw/campaign_data_{args.tier}.csv'
         print(f"Generating {args.tier.upper()} ({counts[args.tier]:,} records)...")
-        df = generate_batch(counts[args.tier])
+        df = generate_batch(counts[args.tier], seed=42)
         df.to_csv(target, index=False)
         print(f"Saved to {target}")
+

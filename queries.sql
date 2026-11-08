@@ -185,17 +185,17 @@ SELECT
     cp.cpa AS historical_cpa_rs,
     b.blended_roas AS benchmark_roas,
     CASE
-        WHEN cp.roas >= b.blended_roas * 1.15 THEN 'INCREASE BUDGET (+15% to +35%) - HIGH EFFICIENCY'
-        WHEN cp.roas >= b.blended_roas THEN 'MAINTAIN / OPTIMIZE - MEETS BENCHMARK'
-        WHEN cp.roas >= 2.50 THEN 'SOFT SCALE - TEST CREATIVE / NARROW TARGETING'
-        ELSE 'REDUCE BUDGET (-30% to -50%) - UNDERPERFORMING'
+        WHEN cp.roas >= b.blended_roas * 1.15 THEN 'PRIMARY SCALE (+25% to +40%) - HIGH EFFICIENCY'
+        WHEN cp.roas >= b.blended_roas THEN 'CORE EXPANSION - MEETS BENCHMARK'
+        WHEN cp.roas >= 2.50 THEN 'RETARGETING & RETENTION'
+        ELSE 'REDUCE / TOP-OF-FUNNEL DISCOVERY'
     END AS budget_recommendation,
     CASE
-        WHEN cp.platform = 'Google' THEN 'Allocate 35% of Rs. 1M (Rs. 350,000)'
-        WHEN cp.platform = 'Instagram' THEN 'Allocate 30% of Rs. 1M (Rs. 300,000)'
-        WHEN cp.platform = 'Facebook' THEN 'Allocate 20% of Rs. 1M (Rs. 200,000)'
-        WHEN cp.platform = 'TikTok' THEN 'Allocate 10% of Rs. 1M (Rs. 100,000)'
-        WHEN cp.platform = 'YouTube' THEN 'Allocate 5% of Rs. 1M (Rs. 50,000)'
+        WHEN cp.platform = 'Google' THEN 'Allocate 40% of Rs. 1M (Rs. 400,000)'
+        WHEN cp.platform = 'Instagram' THEN 'Allocate 35% of Rs. 1M (Rs. 350,000)'
+        WHEN cp.platform = 'Facebook' THEN 'Allocate 13% of Rs. 1M (Rs. 130,000)'
+        WHEN cp.platform = 'TikTok' THEN 'Allocate 8% of Rs. 1M (Rs. 80,000)'
+        WHEN cp.platform = 'YouTube' THEN 'Allocate 4% of Rs. 1M (Rs. 40,000)'
         ELSE 'Review'
     END AS target_rs_1m_allocation
 FROM channel_perf cp

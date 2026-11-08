@@ -28,11 +28,59 @@ import pandas as pd
 import numpy as np
 
 
+# Pakistani D2C E-Commerce Commercial Unit Economics Benchmarks
+COGS_PCT = 0.45                    # Cost of Goods Sold: 45% of gross revenue (manufacturing & fabric)
+COURIER_FEE = 220.0                # Standard forward shipping cost per order via TCS/CallCourier (PKR)
+COD_RETURN_RATE = 0.12             # 12% industry baseline for Cash-on-Delivery customer doorstep returns
+RETURN_LOGISTICS_FEE = 180.0       # Reverse logistics / RTO courier surcharge per returned parcel (PKR)
+
+
+def validate_data_quality(df: pd.DataFrame) -> dict:
+    """
+    Perform rigorous data quality verification, anomaly detection, and schema validation.
+    Returns a dictionary of validation results.
+    """
+    issues = []
+    
+    # 1. Null check
+    null_counts = df.isnull().sum()
+    total_nulls = int(null_counts.sum())
+    if total_nulls > 0:
+        issues.append(f"Found {total_nulls} null values across columns.")
+        
+    # 2. Non-negative constraints
+    neg_spend = (df['spend'] < 0).sum()
+    neg_rev = (df['revenue'] < 0).sum()
+    neg_clicks = (df['clicks'] < 0).sum()
+    if neg_spend > 0 or neg_rev > 0 or neg_clicks > 0:
+        issues.append(f"Negative values detected: spend={neg_spend}, revenue={neg_rev}, clicks={neg_clicks}")
+        
+    # 3. Funnel logic integrity (Clicks <= Impressions)
+    invalid_clicks = (df['clicks'] > df['impressions']).sum()
+    if invalid_clicks > 0:
+        issues.append(f"{invalid_clicks} rows have clicks > impressions.")
+        
+    # 4. Outlier detection on conversion rate
+    cvr_series = np.where(df['clicks'] > 0, df['conversions'] / df['clicks'], 0)
+    outlier_cvr = (cvr_series > 0.50).sum()  # Unrealistic >50% conversion rate
+    if outlier_cvr > 0:
+        issues.append(f"{outlier_cvr} rows exceed 50% conversion rate anomaly threshold.")
+        
+    status = "PASSED" if len(issues) == 0 else "WARNING"
+    report = {
+        'status': status,
+        'records_checked': len(df),
+        'total_nulls': total_nulls,
+        'issues': issues
+    }
+    return report
+
+
 def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute row-level and grouped marketing efficiency metrics."""
+    """Compute row-level and grouped marketing efficiency metrics with full unit economics."""
     data = df.copy()
     
-    # Safe division helpers
+    # Standard digital marketing funnel metrics
     data['ctr'] = np.where(data['impressions'] > 0, (data['clicks'] / data['impressions']) * 100, 0.0).round(2)
     data['cpc'] = np.where(data['clicks'] > 0, data['spend'] / data['clicks'], 0.0).round(2)
     data['cpa'] = np.where(data['conversions'] > 0, data['spend'] / data['conversions'], np.nan).round(2)
@@ -40,13 +88,28 @@ def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
     data['roas'] = np.where(data['spend'] > 0, data['revenue'] / data['spend'], 0.0).round(2)
     data['cpm'] = np.where(data['impressions'] > 0, (data['spend'] / data['impressions']) * 1000, 0.0).round(2)
     data['aov'] = np.where(data['conversions'] > 0, data['revenue'] / data['conversions'], 0.0).round(2)
-    data['net_profit'] = (data['revenue'] - data['spend']).round(2)
+    
+    # Financial Unit Economics:
+    # 1. Gross Contribution Margin (Media Contribution) = Gross Revenue - Ad Spend
+    data['gross_margin'] = (data['revenue'] - data['spend']).round(2)
+    
+    # 2. Delivered Revenue (adjusting for 12% COD return rate at doorstep)
+    delivered_revenue = data['revenue'] * (1.0 - COD_RETURN_RATE)
+    
+    # 3. Product Cost of Goods Sold (COGS on delivered goods)
+    cogs = delivered_revenue * COGS_PCT
+    
+    # 4. Logistics & COD Return Freight Costs
+    shipping_costs = data['conversions'] * (COURIER_FEE + COD_RETURN_RATE * RETURN_LOGISTICS_FEE)
+    
+    # 5. True Net Profit (Operating Margin) = Delivered Revenue - COGS - Shipping - Ad Spend
+    data['true_net_profit'] = (delivered_revenue - cogs - shipping_costs - data['spend']).round(2)
     
     return data
 
 
 def aggregate_by_dimension(df: pd.DataFrame, dimension: str) -> pd.DataFrame:
-    """Aggregate campaign performance by any categorical dimension."""
+    """Aggregate campaign performance by any categorical dimension with standard errors and unit economics."""
     grouped = df.groupby(dimension).agg({
         'spend': 'sum',
         'revenue': 'sum',
@@ -62,7 +125,23 @@ def aggregate_by_dimension(df: pd.DataFrame, dimension: str) -> pd.DataFrame:
     grouped['roas'] = (grouped['revenue'] / grouped['spend']).round(2)
     grouped['cpm'] = ((grouped['spend'] / grouped['impressions']) * 1000).round(2)
     grouped['aov'] = (grouped['revenue'] / grouped['conversions']).round(2)
-    grouped['net_profit'] = (grouped['revenue'] - grouped['spend']).round(2)
+    
+    # Media Contribution Margin
+    grouped['gross_margin'] = (grouped['revenue'] - grouped['spend']).round(2)
+    
+    # True Net Profit Accounting
+    delivered_rev = grouped['revenue'] * (1.0 - COD_RETURN_RATE)
+    total_cogs = delivered_rev * COGS_PCT
+    total_shipping = grouped['conversions'] * (COURIER_FEE + COD_RETURN_RATE * RETURN_LOGISTICS_FEE)
+    grouped['true_net_profit'] = (delivered_rev - total_cogs - total_shipping - grouped['spend']).round(2)
+    grouped['net_profit_margin_pct'] = ((grouped['true_net_profit'] / grouped['revenue']) * 100).round(1)
+    
+    # Statistical Standard Error for ROAS
+    # Approximate SE for ratio estimation: SE(ROAS) = ROAS / sqrt(N_conversions)
+    grouped['roas_se'] = np.where(grouped['conversions'] > 0, 
+                                  (grouped['roas'] / np.sqrt(grouped['conversions'])).round(3), 0.0)
+    grouped['roas_ci_lower'] = (grouped['roas'] - 1.96 * grouped['roas_se']).clip(lower=0).round(2)
+    grouped['roas_ci_upper'] = (grouped['roas'] + 1.96 * grouped['roas_se']).round(2)
     
     # Portfolio share percentages
     total_spend = grouped['spend'].sum()
@@ -73,6 +152,7 @@ def aggregate_by_dimension(df: pd.DataFrame, dimension: str) -> pd.DataFrame:
     return grouped
 
 
+
 def run_metrics_pipeline(input_csv: str = 'data/raw/campaign_data_100k.csv', output_dir: str = 'data/processed'):
     """Execute complete metrics calculation and export structured analytics tables."""
     os.makedirs(output_dir, exist_ok=True)
@@ -80,6 +160,13 @@ def run_metrics_pipeline(input_csv: str = 'data/raw/campaign_data_100k.csv', out
     df = pd.read_csv(input_csv)
     print(f"Loaded {len(df):,} records.")
     
+    # 1. Rigorous Data Quality Verification
+    val_report = validate_data_quality(df)
+    print(f"  ✓ Data Quality Check: {val_report['status']} ({len(df):,} rows checked, {val_report['total_nulls']} nulls)")
+    if val_report['issues']:
+        for issue in val_report['issues']:
+            print(f"    - Notice: {issue}")
+            
     # Platform Summary
     platform_summary = aggregate_by_dimension(df, 'platform').sort_values('roas', ascending=False)
     platform_summary.to_csv(os.path.join(output_dir, 'platform_summary.csv'), index=False)
@@ -118,34 +205,34 @@ def run_metrics_pipeline(input_csv: str = 'data/raw/campaign_data_100k.csv', out
     platform_summary.to_csv(os.path.join(output_dir, 'campaign_metrics_summary.csv'), index=False)
     
     # Print Executive Summary Table
-    print("\n" + "=" * 90)
-    print(" 🇵🇰 PAKISTAN DIGITAL ADVERTISING PLATFORM EFFICIENCY BENCHMARK")
-    print("=" * 90)
-    print(f"{'Platform':<12} {'Spend (Rs.)':>14} {'Revenue (Rs.)':>16} {'ROAS':>7} {'CPA (Rs.)':>11} {'CPC (Rs.)':>11} {'CVR %':>7} {'CTR %':>7}")
-    print("-" * 90)
+    print("\n" + "=" * 105)
+    print(" 🇵🇰 PAKISTAN DIGITAL ADVERTISING PLATFORM EFFICIENCY & UNIT ECONOMICS")
+    print("=" * 105)
+    print(f"{'Platform':<12} {'Spend (Rs.)':>12} {'Revenue (Rs.)':>14} {'ROAS (95% CI)':>15} {'CPA (Rs.)':>10} {'Net Profit':>14} {'Net %':>7}")
+    print("-" * 105)
     
     total_spend = platform_summary['spend'].sum()
     total_revenue = platform_summary['revenue'].sum()
     total_conversions = platform_summary['conversions'].sum()
     total_clicks = platform_summary['clicks'].sum()
     total_impressions = platform_summary['impressions'].sum()
+    total_true_profit = platform_summary['true_net_profit'].sum()
     
     for _, row in platform_summary.iterrows():
-        print(f"{row['platform']:<12} Rs. {row['spend']:>10,.0f} Rs. {row['revenue']:>12,.0f} "
-              f"{row['roas']:>6.2f}x Rs. {row['cpa']:>7,.0f} Rs. {row['cpc']:>7.2f} "
-              f"{row['cvr']:>6.2f}% {row['ctr']:>6.2f}%")
+        roas_ci = f"{row['roas']:.2f}±{row['roas_se']:.2f}"
+        print(f"{row['platform']:<12} Rs. {row['spend']:>8,.0f} Rs. {row['revenue']:>10,.0f} "
+              f"{roas_ci:>14} Rs. {row['cpa']:>6,.0f} Rs. {row['true_net_profit']:>10,.0f} "
+              f"{row['net_profit_margin_pct']:>6.1f}%")
         
-    print("-" * 90)
+    print("-" * 105)
     blended_roas = total_revenue / total_spend
     blended_cpa = total_spend / total_conversions
-    blended_cpc = total_spend / total_clicks
-    blended_cvr = (total_conversions / total_clicks) * 100
-    blended_ctr = (total_clicks / total_impressions) * 100
+    blended_net_pct = (total_true_profit / total_revenue) * 100
     
-    print(f"{'BLENDED TOTAL':<12} Rs. {total_spend:>10,.0f} Rs. {total_revenue:>12,.0f} "
-          f"{blended_roas:>6.2f}x Rs. {blended_cpa:>7,.0f} Rs. {blended_cpc:>7.2f} "
-          f"{blended_cvr:>6.2f}% {blended_ctr:>6.2f}%")
-    print("=" * 90)
+    print(f"{'BLENDED TOTAL':<12} Rs. {total_spend:>8,.0f} Rs. {total_revenue:>10,.0f} "
+          f"{blended_roas:>14.2f}x Rs. {blended_cpa:>6,.0f} Rs. {total_true_profit:>10,.0f} "
+          f"{blended_net_pct:>6.1f}%")
+    print("=" * 105)
     print(f"Summary datasets saved to '{output_dir}/'")
 
 

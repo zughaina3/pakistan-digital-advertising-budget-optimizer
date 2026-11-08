@@ -1,4 +1,4 @@
-Strategy,Spend (Rs.),Revenue (Rs.),Blended ROAS,Blended CPA (Rs.),Conversions,Net Profit (Rs.),Allocation Split
-Balanced Growth (Recommended),1000000.0,3090388.21,3.09x,571.43,1750,2090388.21,"Google 35%, IG 30%, FB 20%, TT 10%, YT 5%"
-ROAS Maximizer,1000000.0,3181054.56,3.18x,546.75,1829,2181054.56,"Google 45%, IG 35%, FB 15%, TT 5%, YT 0%"
-Aggressive Scale,1000000.0,2989779.12,2.99x,528.26,1893,1989779.12,"IG 35%, TT 25%, Google 25%, FB 15%, YT 0%"
+Strategy,Spend (Rs.),Revenue (Rs.),Blended ROAS,Blended CPA (Rs.),Conversions,Media Margin (Rs.),True Operating Profit (Rs.),Net Margin %,Allocation Split,Optimization Status
+Balanced Growth (Recommended),1000000.0,5420821.37,5.42x,689.66,1450,4420821.37,1273357.54,23.5%,"Google 40%, Instagram 35%, Facebook 13%, TikTok 8%, YouTube 4%",SLSQP (Sequential Least Squares Programming) (34 iters)
+ROAS Maximizer,1000000.0,5898018.02,5.9x,727.8,1374,4898018.02,1522682.31,25.8%,"Google 60%, Instagram 34%, Facebook 2%, TikTok 2%, YouTube 2%",SLSQP (Sequential Least Squares Programming) (37 iters)
+Aggressive Scale,1000000.0,4772758.88,4.77x,633.31,1579,3772758.89,928528.9,19.5%,"Google 14%, Instagram 45%, Facebook 9%, TikTok 30%, YouTube 2%",SLSQP (Sequential Least Squares Programming) (42 iters)
