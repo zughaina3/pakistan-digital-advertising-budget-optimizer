@@ -7,3 +7,5 @@ __pycache__/
 .DS_Store
 *.html
 data/raw/campaign_data_1m.csv
+data/raw/campaign_data_10m.csv
+

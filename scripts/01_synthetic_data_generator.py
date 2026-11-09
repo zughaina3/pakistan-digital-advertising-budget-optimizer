@@ -277,8 +277,22 @@ def generate_streaming_chunks(total_records: int, chunk_size: int = 1000000, sta
         gc.collect()
 
 
+def generate_10m_dataset(output_path: str = 'data/raw/campaign_data_10m.csv') -> str:
+    """Generate Tier 10M (10,000,000 records) to CSV via streaming chunks."""
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    print(f"Generating Tier 10M (10,000,000 records) to {output_path}...")
+    first = True
+    for chunk in generate_streaming_chunks(10000000, chunk_size=1000000):
+        chunk.to_csv(output_path, mode='w' if first else 'a', header=first, index=False)
+        first = False
+        print("  ✓ Appended 1,000,000 records to disk...")
+    size_mb = os.path.getsize(output_path) / (1024 * 1024)
+    print(f"✓ Saved 10M records to {output_path} ({size_mb:.2f} MB)")
+    return output_path
+
+
 def generate_all_datasets(output_dir: str = 'data/raw', include_10m: bool = False):
-    """Generate datasets for 10K, 100K, and 1M records."""
+    """Generate datasets for 10K, 100K, and 1M records (and optionally 10M)."""
     os.makedirs(output_dir, exist_ok=True)
     
     tiers = {
@@ -298,15 +312,8 @@ def generate_all_datasets(output_dir: str = 'data/raw', include_10m: bool = Fals
         generated_files[label] = filepath
         
     if include_10m:
-        print("Generating Tier 10M (10,000,000 records via streaming chunks)...")
         filepath_10m = os.path.join(output_dir, 'campaign_data_10m.csv')
-        first = True
-        for chunk in generate_streaming_chunks(10000000, chunk_size=1000000):
-            chunk.to_csv(filepath_10m, mode='w' if first else 'a', header=first, index=False)
-            first = False
-            print("  ✓ Appended 1,000,000 records...")
-        size_mb = os.path.getsize(filepath_10m) / (1024 * 1024)
-        print(f"  ✓ Saved 10M records to {filepath_10m} ({size_mb:.2f} MB)")
+        generate_10m_dataset(filepath_10m)
         generated_files['10m'] = filepath_10m
     
     print("\nDataset generation complete!")
@@ -322,7 +329,7 @@ if __name__ == '__main__':
     if args.tier == 'all':
         generate_all_datasets()
     elif args.tier == '10m':
-        generate_all_datasets(include_10m=True)
+        generate_10m_dataset()
     else:
         counts = {'10k': 10000, '100k': 100000, '1m': 1000000}
         os.makedirs('data/raw', exist_ok=True)
@@ -331,4 +338,5 @@ if __name__ == '__main__':
         df = generate_batch(counts[args.tier], seed=42)
         df.to_csv(target, index=False)
         print(f"Saved to {target}")
+
 

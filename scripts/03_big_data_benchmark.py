@@ -252,8 +252,16 @@ def execute_isolated_worker(engine: str, tier: str, csv_path: str = None) -> dic
         total_time = 0.0
         acc = None
         
+        def iter_10m_chunks(seed):
+            if csv_path and os.path.exists(csv_path):
+                for c in pd.read_csv(csv_path, chunksize=chunk_size):
+                    yield c
+            else:
+                for c in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=seed):
+                    yield c
+
         if engine == 'pandas':
-            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=101):
+            for chunk_df in iter_10m_chunks(101):
                 t0 = time.perf_counter()
                 c_agg = chunk_df.groupby(['platform', 'city']).agg({
                     'spend': 'sum', 'revenue': 'sum', 'impressions': 'sum', 'clicks': 'sum', 'conversions': 'sum'
@@ -263,7 +271,7 @@ def execute_isolated_worker(engine: str, tier: str, csv_path: str = None) -> dic
             rows_out = len(acc)
             
         elif engine == 'spark':
-            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=301):
+            for chunk_df in iter_10m_chunks(301):
                 t0 = time.perf_counter()
                 c_spark = run_spark_simulation_engine(chunk_df)
                 acc = c_spark if acc is None else pd.concat([acc, c_spark]).groupby(['platform', 'city']).sum().reset_index()
@@ -272,7 +280,7 @@ def execute_isolated_worker(engine: str, tier: str, csv_path: str = None) -> dic
             
         elif engine == 'mapreduce':
             mr_global = defaultdict(lambda: [0.0, 0.0, 0, 0, 0])
-            for chunk_df in generate_streaming_chunks(total_records, chunk_size=chunk_size, start_seed=201):
+            for chunk_df in iter_10m_chunks(201):
                 t0 = time.perf_counter()
                 c_mr = run_mapreduce_engine(chunk_df)
                 for _, r in c_mr.iterrows():
@@ -333,7 +341,9 @@ def run_full_benchmark(data_dir: str = 'data/raw', output_csv: str = 'data/proce
     ]
     
     if include_10m:
-        tiers.append(('10m', 10000000, None))
+        path_10m = os.path.join(data_dir, 'campaign_data_10m.csv')
+        tiers.append(('10m', 10000000, path_10m if os.path.exists(path_10m) else None))
+
         
     print("\n" + "=" * 90)
     print(" 🚀 BIG DATA BENCHMARK: PANDAS vs. MAPREDUCE vs. SPARK ARCHITECTURE")
